@@ -38,6 +38,7 @@ final class ChatCompletionService
      * @param string $model 模型名称，如 'deepseek-chat'
      * @param array<int, array<string, mixed>> $messages 消息列表，遵循 OpenAI 格式
      * @param array<string, mixed> $options 额外请求选项，如 temperature、max_tokens 等
+     * @param int|null $timeout 超时时间（秒），为空则使用默认值
      * @return ChatCompletionLog 包含请求和响应数据的日志记录
      * @throws ApiException 当配置缺失或 API 请求失败时
      */
