@@ -1,0 +1,84 @@
+parameters:
+  tourze_silicon_flow.api_key: ''
+  tourze_silicon_flow.base_url: 'https://api.siliconflow.cn'
+  tourze_silicon_flow.request_timeout: 30
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  # Admin Controllers
+  Tourze\SiliconFlowBundle\Controller\Admin\ChatCompletionLogCrudController:
+    tags:
+      - controller.service_arguments
+
+  Tourze\SiliconFlowBundle\Controller\Admin\SiliconFlowConfigCrudController:
+    tags:
+      - controller.service_arguments
+
+  Tourze\SiliconFlowBundle\Controller\Admin\SiliconFlowConversationCrudController:
+    tags:
+      - controller.service_arguments
+
+  Tourze\SiliconFlowBundle\Controller\Admin\SiliconFlowImageGenerationCrudController:
+    tags:
+      - controller.service_arguments
+
+  Tourze\SiliconFlowBundle\Controller\Admin\SiliconFlowModelCrudController:
+    tags:
+      - controller.service_arguments
+
+  Tourze\SiliconFlowBundle\Controller\Admin\SiliconFlowVideoGenerationCrudController:
+    tags:
+      - controller.service_arguments
+
+  Tourze\SiliconFlowBundle\Controller\:
+    resource: '../../Controller/'
+    tags: ['controller.service_arguments']
+
+  Tourze\SiliconFlowBundle\Command\:
+    resource: '../../Command/'
+    tags: ['console.command']
+
+  Tourze\SiliconFlowBundle\Client\SiliconFlowApiClient:
+    arguments:
+      $httpClient: '@http_client'
+      $logger: '@logger'
+      $defaultTimeout: '%tourze_silicon_flow.request_timeout%'
+
+  Tourze\SiliconFlowBundle\Repository\ChatCompletionLogRepository:
+    tags:
+      - doctrine.repository_service
+
+  Tourze\SiliconFlowBundle\Repository\SiliconFlowConfigRepository:
+    tags:
+      - doctrine.repository_service
+  Tourze\SiliconFlowBundle\Repository\SiliconFlowConversationRepository:
+    tags:
+      - doctrine.repository_service
+  Tourze\SiliconFlowBundle\Repository\SiliconFlowImageGenerationRepository:
+    tags:
+      - doctrine.repository_service
+  Tourze\SiliconFlowBundle\Repository\SiliconFlowModelRepository:
+    tags:
+      - doctrine.repository_service
+  Tourze\SiliconFlowBundle\Repository\SiliconFlowVideoGenerationRepository:
+    tags:
+      - doctrine.repository_service
+
+  Tourze\SiliconFlowBundle\Service\ChatCompletionService:
+    public: true
+
+  Tourze\SiliconFlowBundle\Service\ResponseExtractor:
+    public: true
+
+  Tourze\SiliconFlowBundle\Service\ImageProcessingService:
+    public: true
+
+  Tourze\SiliconFlowBundle\Service\AdminMenu:
+    tags:
+      - easy-admin-menu.provider
+
+  Tourze\SiliconFlowBundle\Service\AttributeControllerLoader:
+    public: true
