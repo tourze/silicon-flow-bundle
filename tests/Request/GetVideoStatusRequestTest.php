@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tourze\SiliconFlowBundle\Tests\Request;
 
-use HttpClientBundle\Tests\Request\RequestTestCase;
+use HttpClientBundle\Test\RequestTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tourze\SiliconFlowBundle\Entity\SiliconFlowConfig;
 use Tourze\SiliconFlowBundle\Request\GetVideoStatusRequest;
