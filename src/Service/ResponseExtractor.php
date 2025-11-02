@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tourze\SiliconFlowBundle\Service;
 
+use Symfony\Contracts\HttpClient\ResponseInterface;
 use Tourze\SiliconFlowBundle\Entity\SiliconFlowModel;
 
 /**
@@ -17,6 +18,19 @@ use Tourze\SiliconFlowBundle\Entity\SiliconFlowModel;
  */
 final class ResponseExtractor
 {
+    /**
+     * 适配：解析 HTTP 响应为数组（非抛错模式）
+     *
+     * @return array<string, mixed>
+     */
+    private function decodeResponse(ResponseInterface $response): array
+    {
+        $content = $response->getContent(false);
+        $data = json_decode($content, true);
+
+        return is_array($data) ? $data : [];
+    }
+
     /**
      * @param array<string, mixed> $response
      */
@@ -40,6 +54,19 @@ final class ResponseExtractor
     }
 
     /**
+     * 适配：兼容基于“对话补全”风格的响应结构（如 choices/usage）
+     *
+     * - 入参：Symfony ResponseInterface
+     * - 出参：解码后的数组（若非 JSON，返回空数组）
+     *
+     * @return array<string, mixed>
+     */
+    public function extractCompletionResponse(ResponseInterface $response): array
+    {
+        return $this->decodeResponse($response);
+    }
+
+    /**
      * @param array<string, mixed> $response
      * @return string[]|null
      */
@@ -60,6 +87,19 @@ final class ResponseExtractor
         }
 
         return [] !== $urls ? $urls : null;
+    }
+
+    /**
+     * 适配：兼容图像生成风格的响应结构（如 data 数组）
+     *
+     * - 入参：Symfony ResponseInterface
+     * - 出参：解码后的数组
+     *
+     * @return array<string, mixed>
+     */
+    public function extractImageGenerationResponse(ResponseInterface $response): array
+    {
+        return $this->decodeResponse($response);
     }
 
     /**
@@ -89,6 +129,19 @@ final class ResponseExtractor
         }
 
         return [] !== $urls ? $urls : null;
+    }
+
+    /**
+     * 适配：兼容错误响应结构（如 error 下的 message/code）
+     *
+     * - 入参：Symfony ResponseInterface
+     * - 出参：解码后的数组
+     *
+     * @return array<string, mixed>
+     */
+    public function extractErrorResponse(ResponseInterface $response): array
+    {
+        return $this->decodeResponse($response);
     }
 
     /**

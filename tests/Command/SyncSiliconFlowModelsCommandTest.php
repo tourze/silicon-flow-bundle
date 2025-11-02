@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\NullLogger;
 use Tourze\PHPUnitSymfonyKernelTest\AbstractIntegrationTestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -45,7 +46,7 @@ final class SyncSiliconFlowModelsCommandTest extends AbstractIntegrationTestCase
         $this->assertInstanceOf(EntityManagerInterface::class, $this->entityManager);
 
         // 创建一个 MockHttpClient，默认返回成功响应
-        $this->apiClient = new SiliconFlowApiClient(new MockHttpClient(), 30);
+        $this->apiClient = new SiliconFlowApiClient(new MockHttpClient(), new NullLogger(), 30);
 
         $command = new SyncSiliconFlowModelsCommand(
             $this->configRepository,
@@ -110,7 +111,7 @@ final class SyncSiliconFlowModelsCommandTest extends AbstractIntegrationTestCase
             return new MockResponse($responseBody, ['http_code' => 200]);
         });
 
-        $apiClient = new SiliconFlowApiClient($mockHttpClient, 30);
+        $apiClient = new SiliconFlowApiClient($mockHttpClient, new NullLogger(), 30);
 
         $command = new SyncSiliconFlowModelsCommand(
             $this->configRepository,
@@ -175,7 +176,7 @@ final class SyncSiliconFlowModelsCommandTest extends AbstractIntegrationTestCase
             ]);
         });
 
-        $apiClient = new SiliconFlowApiClient($mockHttpClient, 30);
+        $apiClient = new SiliconFlowApiClient($mockHttpClient, new NullLogger(), 30);
 
         $command = new SyncSiliconFlowModelsCommand(
             $this->configRepository,
@@ -224,7 +225,7 @@ final class SyncSiliconFlowModelsCommandTest extends AbstractIntegrationTestCase
             return new MockResponse($responseBody, ['http_code' => 200]);
         });
 
-        $apiClient = new SiliconFlowApiClient($mockHttpClient, 30);
+        $apiClient = new SiliconFlowApiClient($mockHttpClient, new NullLogger(), 30);
 
         $command = new SyncSiliconFlowModelsCommand(
             $this->configRepository,

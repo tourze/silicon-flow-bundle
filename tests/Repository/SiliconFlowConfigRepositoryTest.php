@@ -37,9 +37,8 @@ class SiliconFlowConfigRepositoryTest extends AbstractIntegrationTestCase
         $config = $this->repository->findActiveConfig();
         if ($config !== null) {
             $this->assertInstanceOf(\Tourze\SiliconFlowBundle\Entity\SiliconFlowConfig::class, $config);
-        } else {
-            $this->assertNull($config);
         }
+        // else 分支中 $config 已被类型系统收窄为 null，无需额外断言
     }
 
     public function testFindActiveConfigs(): void

@@ -25,6 +25,20 @@ final class ImageProcessingService
     }
 
     /**
+     * 便捷方法：批量处理图片 URL（字符串数组），内部复用 transformUrlArray。
+     *
+     * - 入参：string[]
+     * - 出参：array<int, string|array<string, mixed>>（可能被镜像为本地 URL）
+     *
+     * @param string[] $urls
+     * @return array<int, string|array<string, mixed>>
+     */
+    public function processImageUrls(array $urls): array
+    {
+        return $this->transformUrlArray($urls);
+    }
+
+    /**
      * @param array<string, mixed> $response
      * @return array<string, mixed>
      */

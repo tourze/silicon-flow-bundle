@@ -39,15 +39,11 @@ class AttributeControllerLoaderTest extends AbstractIntegrationTestCase
     public function testLoadControllers(): void
     {
         // 测试加载控制器
-        $routes = $this->loader->loadRoutes();
-        $this->assertIsArray($routes);
+        $routes = $this->loader->autoload();
+        $this->assertInstanceOf(\Symfony\Component\Routing\RouteCollection::class, $routes);
 
         // 验证返回的是路由集合
-        foreach ($routes as $route) {
-            $this->assertIsArray($route);
-            // 路由应该有基本的结构
-            $this->assertTrue(is_array($route) || is_object($route));
-        }
+        $this->assertGreaterThanOrEqual(0, $routes->count());
     }
 
     public function testGetControllersDirectory(): void
@@ -61,7 +57,7 @@ class AttributeControllerLoaderTest extends AbstractIntegrationTestCase
             $directory = $method->invoke($this->loader);
 
             $this->assertIsString($directory);
-            $this->assertStringContains('Controller', $directory);
+            $this->assertStringContainsString('Controller', $directory);
         } else {
             $this->markTestSkipped('getControllersDirectory method not found');
         }
@@ -78,7 +74,7 @@ class AttributeControllerLoaderTest extends AbstractIntegrationTestCase
             $namespace = $method->invoke($this->loader);
 
             $this->assertIsString($namespace);
-            $this->assertStringContains('SiliconFlowBundle', $namespace);
+            $this->assertStringContainsString('SiliconFlowBundle', $namespace);
         } else {
             $this->markTestSkipped('getNamespace method not found');
         }

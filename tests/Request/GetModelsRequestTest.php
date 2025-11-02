@@ -27,10 +27,12 @@ final class GetModelsRequestTest extends TestCase
         self::assertArrayHasKey('headers', $options);
 
         $query = $options['query'];
+        self::assertIsArray($query);
         self::assertSame('text', $query['type'] ?? null);
         self::assertSame(2, $query['page'] ?? null);
 
         $headers = $options['headers'];
+        self::assertIsArray($headers);
         self::assertSame('Bearer model-token', $headers['Authorization'] ?? null);
 
         self::assertSame('GET', $request->getRequestMethod());

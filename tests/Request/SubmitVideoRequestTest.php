@@ -6,6 +6,8 @@ namespace Tourze\SiliconFlowBundle\Tests\Request;
 
 use HttpClientBundle\Test\RequestTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Tourze\SiliconFlowBundle\Entity\SiliconFlowConfig;
+use Tourze\SiliconFlowBundle\Exception\ApiException;
 use Tourze\SiliconFlowBundle\Request\SubmitVideoRequest;
 
 /**
@@ -14,44 +16,82 @@ use Tourze\SiliconFlowBundle\Request\SubmitVideoRequest;
 #[CoversClass(SubmitVideoRequest::class)]
 class SubmitVideoRequestTest extends RequestTestCase
 {
+    private SiliconFlowConfig $config;
+
+    protected function setUp(): void
+    {
+        $this->config = new SiliconFlowConfig();
+        $this->config->setName('test');
+        $this->config->setBaseUrl('https://api.siliconflow.cn');
+        $this->config->setApiToken('test-token');
+    }
+
     public function testConstruct(): void
     {
-        $request = new SubmitVideoRequest();
+        $payload = [
+            'model' => 'cogvideox-flash',
+            'prompt' => 'A flying bird in the sky',
+            'image_size' => '1280x720',
+        ];
+        $request = new SubmitVideoRequest($this->config, $payload);
         $this->assertInstanceOf(SubmitVideoRequest::class, $request);
     }
 
     public function testGetMethod(): void
     {
-        $request = new SubmitVideoRequest();
-        $this->assertSame('POST', $request->getMethod());
+        $payload = [
+            'model' => 'cogvideox-flash',
+            'prompt' => 'A flying bird in the sky',
+            'image_size' => '1280x720',
+        ];
+        $request = new SubmitVideoRequest($this->config, $payload);
+        $this->assertSame('POST', $request->getRequestMethod());
     }
 
     public function testGetPath(): void
     {
-        $request = new SubmitVideoRequest();
-        $this->assertSame('/v1/video/submit', $request->getPath());
+        $payload = [
+            'model' => 'cogvideox-flash',
+            'prompt' => 'A flying bird in the sky',
+            'image_size' => '1280x720',
+        ];
+        $request = new SubmitVideoRequest($this->config, $payload);
+        $this->assertSame('/v1/video/submit', $request->getRequestPath());
     }
 
     public function testGetHeaders(): void
     {
-        $request = new SubmitVideoRequest();
-        $headers = $request->getHeaders();
+        $payload = [
+            'model' => 'cogvideox-flash',
+            'prompt' => 'A flying bird in the sky',
+            'image_size' => '1280x720',
+        ];
+        $request = new SubmitVideoRequest($this->config, $payload);
+        $options = $request->getRequestOptions();
 
+        $this->assertIsArray($options);
+        $this->assertArrayHasKey('headers', $options);
+
+        $headers = $options['headers'];
         $this->assertIsArray($headers);
         $this->assertArrayHasKey('Content-Type', $headers);
         $this->assertSame('application/json', $headers['Content-Type']);
+        $this->assertArrayHasKey('Authorization', $headers);
+        $this->assertSame('Bearer test-token', $headers['Authorization']);
     }
 
     public function testGetBody(): void
     {
-        $request = new SubmitVideoRequest();
-        $request->setModel('cogvideox-flash');
-        $request->setPrompt('A flying bird in the sky');
+        $payload = [
+            'model' => 'cogvideox-flash',
+            'prompt' => 'A flying bird in the sky',
+            'image_size' => '1280x720',
+        ];
+        $request = new SubmitVideoRequest($this->config, $payload);
+        $options = $request->getRequestOptions();
 
-        $body = $request->getBody();
-        $this->assertIsString($body);
-
-        $decoded = json_decode($body, true);
+        $this->assertArrayHasKey('json', $options);
+        $decoded = $options['json'];
         $this->assertIsArray($decoded);
         $this->assertArrayHasKey('model', $decoded);
         $this->assertArrayHasKey('prompt', $decoded);
@@ -61,15 +101,19 @@ class SubmitVideoRequestTest extends RequestTestCase
 
     public function testGetBodyWithOptionalParams(): void
     {
-        $request = new SubmitVideoRequest();
-        $request->setModel('cogvideox-5b');
-        $request->setPrompt('Ocean waves');
-        $request->setNegativePrompt('blurry, low quality');
-        $request->setImageSize('768x768');
-        $request->setNumInferenceSteps(20);
+        $payload = [
+            'model' => 'cogvideox-5b',
+            'prompt' => 'Ocean waves',
+            'negative_prompt' => 'blurry, low quality',
+            'image_size' => '768x768',
+            'num_inference_steps' => 20,
+        ];
+        $request = new SubmitVideoRequest($this->config, $payload);
+        $options = $request->getRequestOptions();
 
-        $body = $request->getBody();
-        $decoded = json_decode($body, true);
+        $this->assertArrayHasKey('json', $options);
+        $decoded = $options['json'];
+        $this->assertIsArray($decoded);
 
         $this->assertArrayHasKey('negative_prompt', $decoded);
         $this->assertArrayHasKey('image_size', $decoded);
@@ -83,15 +127,140 @@ class SubmitVideoRequestTest extends RequestTestCase
     {
         $imageBase64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAA...';
 
-        $request = new SubmitVideoRequest();
-        $request->setModel('cogvideox-flash');
-        $request->setPrompt('Animate this image');
-        $request->setImage($imageBase64);
+        $payload = [
+            'model' => 'cogvideox-flash',
+            'prompt' => 'Animate this image',
+            'image' => $imageBase64,
+            'image_size' => '1280x720',
+        ];
+        $request = new SubmitVideoRequest($this->config, $payload);
+        $options = $request->getRequestOptions();
 
-        $body = $request->getBody();
-        $decoded = json_decode($body, true);
+        $this->assertArrayHasKey('json', $options);
+        $decoded = $options['json'];
+        $this->assertIsArray($decoded);
 
         $this->assertArrayHasKey('image', $decoded);
         $this->assertSame($imageBase64, $decoded['image']);
+    }
+
+    public function testValidate(): void
+    {
+        $payload = [
+            'model' => 'cogvideox-flash',
+            'prompt' => 'A flying bird in the sky',
+            'image_size' => '1280x720',
+        ];
+        $request = new SubmitVideoRequest($this->config, $payload);
+
+        // Should not throw when all required fields are present
+        $request->validate();
+        $this->assertTrue(true);
+    }
+
+    public function testValidateWithoutModel(): void
+    {
+        $payload = [
+            'prompt' => 'A flying bird in the sky',
+            'image_size' => '1280x720',
+        ];
+        $request = new SubmitVideoRequest($this->config, $payload);
+
+        $this->expectException(ApiException::class);
+        $this->expectExceptionMessage('Video Submit 请求必须指定模型。');
+        $request->validate();
+    }
+
+    public function testValidateWithoutPrompt(): void
+    {
+        $payload = [
+            'model' => 'cogvideox-flash',
+            'image_size' => '1280x720',
+        ];
+        $request = new SubmitVideoRequest($this->config, $payload);
+
+        $this->expectException(ApiException::class);
+        $this->expectExceptionMessage('Video Submit 请求必须提供 prompt。');
+        $request->validate();
+    }
+
+    public function testValidateWithoutImageSize(): void
+    {
+        $payload = [
+            'model' => 'cogvideox-flash',
+            'prompt' => 'A flying bird in the sky',
+        ];
+        $request = new SubmitVideoRequest($this->config, $payload);
+
+        $this->expectException(ApiException::class);
+        $this->expectExceptionMessage('Video Submit 请求必须指定 image_size。');
+        $request->validate();
+    }
+
+    public function testValidateWithInvalidImageSize(): void
+    {
+        $payload = [
+            'model' => 'cogvideox-flash',
+            'prompt' => 'A flying bird in the sky',
+            'image_size' => 'invalid',
+        ];
+        $request = new SubmitVideoRequest($this->config, $payload);
+
+        $this->expectException(ApiException::class);
+        $this->expectExceptionMessage('image_size 必须符合 widthxheight 格式，例如 1280x720。');
+        $request->validate();
+    }
+
+    public function testParseResponse(): void
+    {
+        $payload = [
+            'model' => 'cogvideox-flash',
+            'prompt' => 'A flying bird in the sky',
+            'image_size' => '1280x720',
+        ];
+        $request = new SubmitVideoRequest($this->config, $payload);
+
+        $responseContent = (string) json_encode([
+            'requestId' => 'req-123456',
+            'status' => 'submitted',
+        ]);
+
+        $result = $request->parseResponse($responseContent);
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('requestId', $result);
+        $this->assertSame('req-123456', $result['requestId']);
+    }
+
+    public function testParseResponseWithMissingRequestId(): void
+    {
+        $payload = [
+            'model' => 'cogvideox-flash',
+            'prompt' => 'A flying bird in the sky',
+            'image_size' => '1280x720',
+        ];
+        $request = new SubmitVideoRequest($this->config, $payload);
+
+        $responseContent = (string) json_encode([
+            'status' => 'submitted',
+        ]);
+
+        $this->expectException(ApiException::class);
+        $this->expectExceptionMessage('视频生成提交接口响应缺少 requestId 字段。');
+        $request->parseResponse($responseContent);
+    }
+
+    public function testParseResponseWithInvalidJson(): void
+    {
+        $payload = [
+            'model' => 'cogvideox-flash',
+            'prompt' => 'A flying bird in the sky',
+            'image_size' => '1280x720',
+        ];
+        $request = new SubmitVideoRequest($this->config, $payload);
+
+        $this->expectException(ApiException::class);
+        $this->expectExceptionMessage('SiliconFlow 返回了无法解析的响应：');
+        $request->parseResponse('invalid json');
     }
 }

@@ -10,7 +10,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\BundleDependency\BundleDependencyInterface;
 use Tourze\PHPUnitSymfonyKernelTest\AbstractIntegrationTestCase;
 use Tourze\SiliconFlowBundle\SiliconFlowBundle;
-use Tourze\SymfonyDependencyServiceLoader\SymfonyDependencyServiceLoaderBundle;
 
 /**
  * SiliconFlow Bundle 测试
@@ -41,8 +40,8 @@ class SiliconFlowBundleTest extends AbstractIntegrationTestCase
         $dependencies = SiliconFlowBundle::getBundleDependencies();
 
         $this->assertIsArray($dependencies);
-        $this->assertContains(DoctrineBundle::class, $dependencies);
-        $this->assertContains(SymfonyDependencyServiceLoaderBundle::class, $dependencies);
+        $this->assertArrayHasKey(DoctrineBundle::class, $dependencies);
+        $this->assertSame(['all' => true], $dependencies[DoctrineBundle::class]);
     }
 
     public function testBundleIsFinal(): void
@@ -54,14 +53,16 @@ class SiliconFlowBundleTest extends AbstractIntegrationTestCase
     public function testExtendsBundle(): void
     {
         $reflection = new \ReflectionClass(SiliconFlowBundle::class);
-        $this->assertSame('Symfony\Component\HttpKernel\Bundle\Bundle', $reflection->getParentClass()->getName());
+        $parentClass = $reflection->getParentClass();
+        $this->assertNotFalse($parentClass, 'SiliconFlowBundle should extend a parent class');
+        $this->assertSame('Symfony\Component\HttpKernel\Bundle\Bundle', $parentClass->getName());
     }
 
     public function testGetPath(): void
     {
         $path = $this->bundle->getPath();
         $this->assertIsString($path);
-        $this->assertStringContains('silicon-flow-bundle', $path);
+        $this->assertStringContainsString('silicon-flow-bundle', $path);
     }
 
     public function testGetName(): void

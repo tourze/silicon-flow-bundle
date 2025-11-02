@@ -4,42 +4,63 @@ declare(strict_types=1);
 
 namespace Tourze\SiliconFlowBundle\Tests\Request;
 
-use HttpClientBundle\Test\RequestTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use Tourze\SiliconFlowBundle\Entity\SiliconFlowConfig;
 use Tourze\SiliconFlowBundle\Request\CreateChatCompletionRequest;
 
 /**
  * ChatCompletion 请求测试
  */
 #[CoversClass(CreateChatCompletionRequest::class)]
-class CreateChatCompletionRequestTest extends RequestTestCase
+class CreateChatCompletionRequestTest extends TestCase
 {
+    private SiliconFlowConfig $config;
+
+    protected function setUp(): void
+    {
+        $this->config = new SiliconFlowConfig();
+        $this->config->setName('test');
+        $this->config->setBaseUrl('https://api.siliconflow.cn');
+        $this->config->setApiToken('test-token');
+    }
+
     public function testConstruct(): void
     {
-        $request = new CreateChatCompletionRequest();
+        $messages = [['role' => 'user', 'content' => 'Hello']];
+        $request = new CreateChatCompletionRequest($this->config, 'test-model', $messages);
         $this->assertInstanceOf(CreateChatCompletionRequest::class, $request);
     }
 
     public function testGetMethod(): void
     {
-        $request = new CreateChatCompletionRequest();
-        $this->assertSame('POST', $request->getMethod());
+        $messages = [['role' => 'user', 'content' => 'Hello']];
+        $request = new CreateChatCompletionRequest($this->config, 'test-model', $messages);
+        $this->assertSame('POST', $request->getRequestMethod());
     }
 
     public function testGetPath(): void
     {
-        $request = new CreateChatCompletionRequest();
-        $this->assertSame('/v1/chat/completions', $request->getPath());
+        $messages = [['role' => 'user', 'content' => 'Hello']];
+        $request = new CreateChatCompletionRequest($this->config, 'test-model', $messages);
+        $this->assertSame('/v1/chat/completions', $request->getRequestPath());
     }
 
     public function testGetHeaders(): void
     {
-        $request = new CreateChatCompletionRequest();
-        $headers = $request->getHeaders();
+        $messages = [['role' => 'user', 'content' => 'Hello']];
+        $request = new CreateChatCompletionRequest($this->config, 'test-model', $messages);
+        $options = $request->getRequestOptions();
 
+        $this->assertIsArray($options);
+        $this->assertArrayHasKey('headers', $options);
+
+        $headers = $options['headers'];
         $this->assertIsArray($headers);
         $this->assertArrayHasKey('Content-Type', $headers);
         $this->assertSame('application/json', $headers['Content-Type']);
+        $this->assertArrayHasKey('Authorization', $headers);
+        $this->assertSame('Bearer test-token', $headers['Authorization']);
     }
 
     public function testGetBody(): void
@@ -48,14 +69,11 @@ class CreateChatCompletionRequestTest extends RequestTestCase
             ['role' => 'user', 'content' => 'Hello, how are you?']
         ];
 
-        $request = new CreateChatCompletionRequest();
-        $request->setModel('claude-3-5-sonnet-20241022');
-        $request->setMessages($messages);
+        $request = new CreateChatCompletionRequest($this->config, 'claude-3-5-sonnet-20241022', $messages);
+        $options = $request->getRequestOptions();
 
-        $body = $request->getBody();
-        $this->assertIsString($body);
-
-        $decoded = json_decode($body, true);
+        $this->assertArrayHasKey('json', $options);
+        $decoded = $options['json'];
         $this->assertIsArray($decoded);
         $this->assertArrayHasKey('model', $decoded);
         $this->assertArrayHasKey('messages', $decoded);
@@ -69,15 +87,18 @@ class CreateChatCompletionRequestTest extends RequestTestCase
             ['role' => 'user', 'content' => 'Hello']
         ];
 
-        $request = new CreateChatCompletionRequest();
-        $request->setModel('claude-3-5-haiku-20241022');
-        $request->setMessages($messages);
-        $request->setMaxTokens(1000);
-        $request->setTemperature(0.7);
-        $request->setStream(true);
+        $options = [
+            'max_tokens' => 1000,
+            'temperature' => 0.7,
+            'stream' => true,
+        ];
 
-        $body = $request->getBody();
-        $decoded = json_decode($body, true);
+        $request = new CreateChatCompletionRequest($this->config, 'claude-3-5-haiku-20241022', $messages, $options);
+        $requestOptions = $request->getRequestOptions();
+
+        $this->assertArrayHasKey('json', $requestOptions);
+        $decoded = $requestOptions['json'];
+        $this->assertIsArray($decoded);
 
         $this->assertArrayHasKey('max_tokens', $decoded);
         $this->assertArrayHasKey('temperature', $decoded);

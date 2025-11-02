@@ -27,9 +27,9 @@ class SiliconFlowExtensionTest extends AbstractDependencyInjectionExtensionTestC
 
         // 备份原始环境变量
         $this->originalEnv = [
-            'SILICON_FLOW_API_KEY' => $_ENV['SILICON_FLOW_API_KEY'] ?? '',
-            'SILICON_FLOW_BASE_URL' => $_ENV['SILICON_FLOW_BASE_URL'] ?? '',
-            'SILICON_FLOW_REQUEST_TIMEOUT' => $_ENV['SILICON_FLOW_REQUEST_TIMEOUT'] ?? '',
+            'SILICON_FLOW_API_KEY' => (string) (getenv('SILICON_FLOW_API_KEY') ?: ''),
+            'SILICON_FLOW_BASE_URL' => (string) (getenv('SILICON_FLOW_BASE_URL') ?: ''),
+            'SILICON_FLOW_REQUEST_TIMEOUT' => (string) (getenv('SILICON_FLOW_REQUEST_TIMEOUT') ?: ''),
         ];
     }
 

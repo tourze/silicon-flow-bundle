@@ -78,6 +78,8 @@ class ResponseExtractorTest extends AbstractIntegrationTestCase
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('error', $result);
-        $this->assertSame('Invalid API key', $result['error']['message']);
+        $error = $result['error'];
+        $this->assertIsArray($error);
+        $this->assertSame('Invalid API key', $error['message']);
     }
 }

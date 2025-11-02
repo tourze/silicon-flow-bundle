@@ -6,6 +6,7 @@ namespace Tourze\SiliconFlowBundle\Tests\Client;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Tourze\PHPUnitSymfonyKernelTest\AbstractIntegrationTestCase;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -42,7 +43,7 @@ final class SiliconFlowApiClientTest extends AbstractIntegrationTestCase
             ], JSON_THROW_ON_ERROR));
         });
 
-        $client = new SiliconFlowApiClient($httpClient, 30);
+        $client = new SiliconFlowApiClient($httpClient, new NullLogger(), 30);
 
         $config = new SiliconFlowConfig();
         $config->setName('primary');
@@ -111,7 +112,7 @@ final class SiliconFlowApiClientTest extends AbstractIntegrationTestCase
             ]);
         });
 
-        $client = new SiliconFlowApiClient($httpClient, 30);
+        $client = new SiliconFlowApiClient($httpClient, new NullLogger(), 30);
 
         $config = new SiliconFlowConfig();
         $config->setName('stream');
@@ -155,7 +156,7 @@ final class SiliconFlowApiClientTest extends AbstractIntegrationTestCase
     {
         $httpClient = new MockHttpClient(static fn (): MockResponse => new MockResponse('{}'));
 
-        $client = new SiliconFlowApiClient($httpClient, 30);
+        $client = new SiliconFlowApiClient($httpClient, new NullLogger(), 30);
 
         $config = new SiliconFlowConfig();
         $config->setName('invalid');

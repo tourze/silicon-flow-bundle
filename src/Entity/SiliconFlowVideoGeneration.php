@@ -55,6 +55,11 @@ class SiliconFlowVideoGeneration implements \Stringable
     #[Assert\PositiveOrZero]
     private ?int $seed = null;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['default' => 5, 'comment' => '采样步数'])]
+    #[Assert\Type(type: 'int')]
+    #[Assert\Positive]
+    private ?int $numInferenceSteps = 5;
+
     /**
      * @var array<string, mixed>
      */
@@ -66,7 +71,7 @@ class SiliconFlowVideoGeneration implements \Stringable
     #[ORM\ManyToOne(targetEntity: BizUser::class)]
     #[ORM\JoinColumn(name: 'sender_id', referencedColumnName: 'id', nullable: false, onDelete: 'RESTRICT')]
     #[Assert\NotNull]
-    private BizUser $sender;
+    private ?BizUser $sender = null;
 
     #[ORM\Column(type: Types::STRING, length: 30, nullable: true, options: ['comment' => '任务状态'])]
     #[Assert\Length(max: 30)]
@@ -197,12 +202,12 @@ class SiliconFlowVideoGeneration implements \Stringable
         $this->requestPayload = $requestPayload;
     }
 
-    public function getSender(): BizUser
+    public function getSender(): ?BizUser
     {
         return $this->sender;
     }
 
-    public function setSender(BizUser $sender): void
+    public function setSender(?BizUser $sender): void
     {
         $this->sender = $sender;
     }
@@ -277,5 +282,31 @@ class SiliconFlowVideoGeneration implements \Stringable
     public function setResponsePayload(?array $responsePayload): void
     {
         $this->responsePayload = $responsePayload;
+    }
+
+    public function getNumInferenceSteps(): ?int
+    {
+        return $this->numInferenceSteps;
+    }
+
+    public function setNumInferenceSteps(?int $numInferenceSteps): void
+    {
+        $this->numInferenceSteps = $numInferenceSteps;
+    }
+
+    /**
+     * Alias for getSender() for backward compatibility
+     */
+    public function getUser(): ?BizUser
+    {
+        return $this->getSender();
+    }
+
+    /**
+     * Alias for setSender() for backward compatibility
+     */
+    public function setUser(?BizUser $user): void
+    {
+        $this->setSender($user);
     }
 }

@@ -293,7 +293,8 @@ final class CreateChatMessagesRequest extends AbstractSiliconFlowRequest
      */
     private function processBlock(array $block, array $contentBlocks): array
     {
-        if ('text' !== $block['type']) {
+        $type = isset($block['type']) && is_string($block['type']) ? $block['type'] : null;
+        if ('text' !== $type) {
             $contentBlocks[] = $block;
 
             return $contentBlocks;
@@ -325,7 +326,8 @@ final class CreateChatMessagesRequest extends AbstractSiliconFlowRequest
      */
     private function shouldAppendToExistingBlock(array $contentBlocks, int $existingIndex): bool
     {
-        return 'text' === ($contentBlocks[$existingIndex]['type'] ?? '');
+        $existingType = $contentBlocks[$existingIndex]['type'] ?? null;
+        return is_string($existingType) && $existingType === 'text';
     }
 
     /**
