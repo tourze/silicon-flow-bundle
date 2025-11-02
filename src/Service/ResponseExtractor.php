@@ -31,6 +31,7 @@ final class ResponseExtractor
             if (is_array($block) && ('text' === ($block['type'] ?? null))) {
                 /** @var string $text */
                 $text = $block['text'] ?? '';
+
                 return $text;
             }
         }
@@ -112,6 +113,7 @@ final class ResponseExtractor
         }
 
         $status = $response['status'];
+
         return is_string($status) ? $status : $default;
     }
 
@@ -125,6 +127,7 @@ final class ResponseExtractor
         }
 
         $reason = $response['reason'];
+
         return is_string($reason) ? $reason : null;
     }
 
@@ -148,6 +151,7 @@ final class ResponseExtractor
         }
 
         $inference = $timings['inference'];
+
         return is_numeric($inference) ? (float) $inference : null;
     }
 
@@ -166,6 +170,7 @@ final class ResponseExtractor
         }
 
         $seed = $results['seed'];
+
         return is_numeric($seed) ? (int) $seed : null;
     }
 }

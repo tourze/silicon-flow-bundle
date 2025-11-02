@@ -102,6 +102,17 @@ final class ChatCompletionService
         $log->setStatus('success');
         $log->setErrorMessage(null);
 
+        $this->setLogResponseFields($log, $response);
+        $this->setLogTokenUsage($log, $response);
+    }
+
+    /**
+     * 设置日志的响应字段
+     *
+     * @param array<string, mixed> $response
+     */
+    private function setLogResponseFields(ChatCompletionLog $log, array $response): void
+    {
         if (isset($response['id']) && is_string($response['id'])) {
             $log->setRequestId($response['id']);
         }
@@ -111,27 +122,46 @@ final class ChatCompletionService
         }
 
         $log->setResponsePayload($response);
+    }
 
+    /**
+     * 设置日志的 token 使用情况
+     *
+     * @param array<string, mixed> $response
+     */
+    private function setLogTokenUsage(ChatCompletionLog $log, array $response): void
+    {
         $usage = $response['usage'] ?? [];
         if (!is_array($usage)) {
             $usage = [];
         }
 
-        $promptTokens = isset($usage['prompt_tokens']) && (is_int($usage['prompt_tokens']) || is_string($usage['prompt_tokens']))
-            ? (int) $usage['prompt_tokens']
-            : 0;
-
-        $completionTokens = isset($usage['completion_tokens']) && (is_int($usage['completion_tokens']) || is_string($usage['completion_tokens']))
-            ? (int) $usage['completion_tokens']
-            : 0;
-
-        $totalTokens = isset($usage['total_tokens']) && (is_int($usage['total_tokens']) || is_string($usage['total_tokens']))
-            ? (int) $usage['total_tokens']
-            : ($promptTokens + $completionTokens);
+        $promptTokens = $this->extractTokenCount($usage, 'prompt_tokens');
+        $completionTokens = $this->extractTokenCount($usage, 'completion_tokens');
+        $totalTokens = $this->extractTokenCount($usage, 'total_tokens', $promptTokens + $completionTokens);
 
         $log->setPromptTokens($promptTokens);
         $log->setCompletionTokens($completionTokens);
         $log->setTotalTokens($totalTokens);
+    }
+
+    /**
+     * 从使用数据中提取 token 数量
+     *
+     * @param array<string, mixed> $usage
+     * @param string $key
+     * @param int $default
+     * @return int
+     */
+    private function extractTokenCount(array $usage, string $key, int $default = 0): int
+    {
+        $value = $usage[$key] ?? null;
+
+        if (is_int($value) || is_string($value)) {
+            return (int) $value;
+        }
+
+        return $default;
     }
 
     private function applyFailure(ChatCompletionLog $log, string $errorMessage): void

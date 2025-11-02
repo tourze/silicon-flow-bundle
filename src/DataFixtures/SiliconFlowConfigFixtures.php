@@ -24,7 +24,6 @@ class SiliconFlowConfigFixtures extends Fixture implements FixtureGroupInterface
 
     public function load(ObjectManager $manager): void
     {
-
         $existing = $this->configRepository->findOneBy(['isActive' => true]);
         if (null !== $existing) {
             $this->addReference(self::DEFAULT_CONFIG_REFERENCE, $existing);
@@ -51,4 +50,3 @@ class SiliconFlowConfigFixtures extends Fixture implements FixtureGroupInterface
         return ['silicon_flow'];
     }
 }
-

@@ -98,7 +98,7 @@ class TestControllerTest extends AbstractWebTestCase
             'chatCompletionService',
             'apiClient',
             'configRepository',
-            'bizUserRepository',
+            'userManager',
             'conversationRepository',
             'imageGenerationRepository',
             'videoGenerationRepository',

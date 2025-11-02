@@ -44,66 +44,7 @@ final class SyncSiliconFlowModelsCommand extends Command
 
         $syncResult = $this->syncModelsFromConfigs($configs, $io);
 
-        foreach ($configs as $config) {
-            foreach (SiliconFlowModel::getSupportedTypes() as $type) {
-                try {
-                    $response = $this->apiClient->request(new GetModelsRequest($config, $type));
-                } catch (ApiException $exception) {
-                    $io->error(sprintf('配置 %s 调用模型接口(type=%s)失败：%s', $config->getName(), $type, $exception->getMessage()));
-                    continue;
-                }
-
-                $models = $response['data'] ?? [];
-                if (!is_array($models)) {
-                    $io->warning(sprintf('配置 %s 在 type=%s 下返回的数据格式不正确，已跳过。', $config->getName(), $type));
-                    continue;
-                }
-
-                $hadSuccessfulResponse = true;
-
-                foreach ($models as $modelData) {
-                    if (!is_array($modelData)) {
-                        continue;
-                    }
-
-                    $validatedModelData = $this->validateModelData($modelData);
-                    if (null === $validatedModelData) {
-                        continue;
-                    }
-
-                    $modelId = $this->extractModelId($validatedModelData);
-                    if (null === $modelId) {
-                        continue;
-                    }
-
-                    if (isset($processedModelIds[$modelId])) {
-                        continue;
-                    }
-
-                    $processedModelIds[$modelId] = true;
-
-                    $model = $this->modelRepository->findOneBy(['modelId' => $modelId]);
-                    $isNew = null === $model;
-
-                    if ($isNew) {
-                        $model = new SiliconFlowModel();
-                        $model->setModelId($modelId);
-                        ++$createdCount;
-                    } else {
-                        ++$updatedCount;
-                    }
-
-                    $model->setType($type);
-                    $model->setObjectType($this->extractObjectType($validatedModelData, $model->getObjectType()));
-                    $model->setIsActive($this->isModelActive($validatedModelData));
-                    $model->setMetadata($validatedModelData);
-
-                    $this->modelRepository->save($model, false);
-                }
-            }
-        }
-
-        if (!$hadSuccessfulResponse) {
+        if (!$syncResult['hadSuccessfulResponse']) {
             $io->warning('所有配置请求均失败，已保留现有模型状态。');
 
             return self::FAILURE;
@@ -167,12 +108,14 @@ final class SyncSiliconFlowModelsCommand extends Command
             $response = $this->apiClient->request(new GetModelsRequest($config));
         } catch (ApiException $exception) {
             $io->error(sprintf('配置 %s 调用模型接口失败：%s', $config->getName(), $exception->getMessage()));
+
             return null;
         }
 
         $models = $response['data'] ?? [];
         if (!is_array($models)) {
             $io->warning(sprintf('配置 %s 返回的模型数据格式不正确，已跳过。', $config->getName()));
+
             return null;
         }
 
@@ -315,7 +258,7 @@ final class SyncSiliconFlowModelsCommand extends Command
             return trim($object);
         }
 
-        return $default !== '' ? $default : 'model';
+        return '' !== $default ? $default : 'model';
     }
 
     /**

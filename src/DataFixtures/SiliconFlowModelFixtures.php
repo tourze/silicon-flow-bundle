@@ -9,6 +9,7 @@ use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\Attribute\When;
 use Tourze\SiliconFlowBundle\Client\SiliconFlowApiClient;
+use Tourze\SiliconFlowBundle\Entity\SiliconFlowConfig;
 use Tourze\SiliconFlowBundle\Entity\SiliconFlowModel;
 use Tourze\SiliconFlowBundle\Exception\ApiException;
 use Tourze\SiliconFlowBundle\Repository\SiliconFlowConfigRepository;
@@ -36,61 +37,120 @@ class SiliconFlowModelFixtures extends Fixture implements FixtureGroupInterface
             return;
         }
 
-        $processedIds = [];
-
-        foreach (SiliconFlowModel::getSupportedTypes() as $type) {
-            try {
-                $response = $this->apiClient->request(new GetModelsRequest($config, $type));
-            } catch (ApiException $exception) {
-                continue;
-            }
-
-            $models = $response['data'] ?? [];
-            if (!is_array($models)) {
-                continue;
-            }
-
-            foreach ($models as $modelData) {
-                if (!is_array($modelData)) {
-                    continue;
-                }
-
-                /** @var array<string, mixed> $modelData */
-                $modelData = array_combine(
-                    array_map('strval', array_keys($modelData)),
-                    array_values($modelData)
-                );
-
-                if (!is_array($modelData)) {
-                    continue;
-                }
-
-                $modelId = $this->extractModelId($modelData);
-                if (null === $modelId) {
-                    continue;
-                }
-
-                $processedIds[$modelId] = true;
-
-                $model = $this->modelRepository->findOneBy(['modelId' => $modelId]);
-                if (null === $model) {
-                    $model = new SiliconFlowModel();
-                    $model->setModelId($modelId);
-                    $manager->persist($model);
-                }
-
-                $model->setType($type);
-                $model->setObjectType($this->extractObjectType($modelData, $model->getObjectType()));
-                $model->setIsActive($this->isModelActive($modelData));
-                $model->setMetadata($modelData);
-            }
-        }
+        $processedIds = $this->loadModelsForAllTypes($config, $manager);
 
         $manager->flush();
 
         if ([] !== $processedIds) {
             $this->modelRepository->deactivateAllExcept(array_keys($processedIds));
         }
+    }
+
+    /**
+     * 为所有支持的类型加载模型
+     *
+     * @param ObjectManager $manager
+     * @return array<string, bool>
+     */
+    private function loadModelsForAllTypes(SiliconFlowConfig $config, ObjectManager $manager): array
+    {
+        $processedIds = [];
+
+        foreach (SiliconFlowModel::getSupportedTypes() as $type) {
+            $typeProcessedIds = $this->loadModelsForType($config, $type, $manager);
+            $processedIds = array_merge($processedIds, $typeProcessedIds);
+        }
+
+        return $processedIds;
+    }
+
+    /**
+     * 为指定类型加载模型
+     *
+     * @param string $type
+     * @param ObjectManager $manager
+     * @return array<string, bool>
+     */
+    private function loadModelsForType(SiliconFlowConfig $config, string $type, ObjectManager $manager): array
+    {
+        try {
+            $response = $this->apiClient->request(new GetModelsRequest($config, $type));
+        } catch (ApiException $exception) {
+            return [];
+        }
+
+        $models = $response['data'] ?? [];
+        if (!is_array($models)) {
+            return [];
+        }
+
+        return $this->processModelDataArray($models, $type, $manager);
+    }
+
+    /**
+     * 处理模型数据数组
+     *
+     * @param array<mixed, mixed> $models
+     * @param string $type
+     * @param ObjectManager $manager
+     * @return array<string, bool>
+     */
+    private function processModelDataArray(array $models, string $type, ObjectManager $manager): array
+    {
+        $processedIds = [];
+
+        foreach ($models as $modelData) {
+            if (!is_array($modelData)) {
+                continue;
+            }
+
+            $modelId = $this->processModelData($modelData, $type, $manager);
+            if (null !== $modelId) {
+                $processedIds[$modelId] = true;
+            }
+        }
+
+        return $processedIds;
+    }
+
+    /**
+     * 处理单个模型数据
+     *
+     * @param array<mixed, mixed> $modelData
+     * @param string $type
+     * @param ObjectManager $manager
+     * @return string|null
+     */
+    private function processModelData(array $modelData, string $type, ObjectManager $manager): ?string
+    {
+        /** @var array<string, mixed> $normalizedData */
+        $normalizedData = array_combine(
+            array_map('strval', array_keys($modelData)),
+            array_values($modelData)
+        );
+
+        if (!is_array($normalizedData)) {
+            return null;
+        }
+
+        $modelId = $this->extractModelId($normalizedData);
+        if (null === $modelId) {
+            return null;
+        }
+
+        $model = $this->modelRepository->findOneBy(['modelId' => $modelId]);
+        if (null === $model) {
+            $model = new SiliconFlowModel();
+            $model->setModelId($modelId);
+            $manager->persist($model);
+        }
+
+        $model->setType($type);
+        $model->setObjectType($this->extractObjectType($normalizedData, $model->getObjectType()));
+        $model->setIsActive($this->isModelActive($normalizedData));
+        $model->setMetadata($normalizedData);
+
+        return $modelId;
     }
 
     public static function getGroups(): array

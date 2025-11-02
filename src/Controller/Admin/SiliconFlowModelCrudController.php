@@ -76,4 +76,3 @@ final class SiliconFlowModelCrudController extends AbstractCrudController
         ;
     }
 }
-

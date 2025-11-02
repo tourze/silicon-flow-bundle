@@ -279,4 +279,3 @@ class SiliconFlowVideoGeneration implements \Stringable
         $this->responsePayload = $responsePayload;
     }
 }
-

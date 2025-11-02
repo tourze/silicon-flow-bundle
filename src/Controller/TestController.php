@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Tourze\SiliconFlowBundle\Controller;
 
 use BizUserBundle\Entity\BizUser;
-use BizUserBundle\Repository\BizUserRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Tourze\SiliconFlowBundle\Client\SiliconFlowApiClient;
+use Tourze\SiliconFlowBundle\Entity\SiliconFlowConfig;
 use Tourze\SiliconFlowBundle\Entity\SiliconFlowConversation;
 use Tourze\SiliconFlowBundle\Entity\SiliconFlowImageGeneration;
 use Tourze\SiliconFlowBundle\Entity\SiliconFlowModel;
@@ -30,6 +30,7 @@ use Tourze\SiliconFlowBundle\Request\SubmitVideoRequest;
 use Tourze\SiliconFlowBundle\Service\ChatCompletionService;
 use Tourze\SiliconFlowBundle\Service\ImageProcessingService;
 use Tourze\SiliconFlowBundle\Service\ResponseExtractor;
+use Tourze\UserServiceContracts\UserManagerInterface;
 
 #[Route(path: '/silicon/test', name: 'silicon_flow_test_')]
 final class TestController extends AbstractController
@@ -38,7 +39,7 @@ final class TestController extends AbstractController
         private readonly ChatCompletionService $chatCompletionService,
         private readonly SiliconFlowApiClient $apiClient,
         private readonly SiliconFlowConfigRepository $configRepository,
-        private readonly BizUserRepository $bizUserRepository,
+        private readonly UserManagerInterface $userManager,
         private readonly SiliconFlowConversationRepository $conversationRepository,
         private readonly SiliconFlowImageGenerationRepository $imageGenerationRepository,
         private readonly SiliconFlowVideoGenerationRepository $videoGenerationRepository,
@@ -174,7 +175,7 @@ final class TestController extends AbstractController
         $videoGeneration->setNegativePrompt($payload['negative_prompt']);
         $videoGeneration->setImageSize($payload['image_size']);
         $videoGeneration->setSeed($payload['seed']);
-        $requestId = isset($response['requestId']) ? $response['requestId'] : null;
+        $requestId = $response['requestId'] ?? null;
         if (null !== $requestId) {
             /** @var string $requestIdValue */
             $requestIdValue = $requestId;
@@ -314,7 +315,7 @@ final class TestController extends AbstractController
         $this->modelRepository->save($model, false);
     }
 
-    private function requireActiveConfig(): \Tourze\SiliconFlowBundle\Entity\SiliconFlowConfig
+    private function requireActiveConfig(): SiliconFlowConfig
     {
         $config = $this->configRepository->findActiveConfig();
         if (null === $config) {
@@ -326,8 +327,8 @@ final class TestController extends AbstractController
 
     private function requireDefaultUser(): BizUser
     {
-        $user = $this->bizUserRepository->findOneBy(['username' => 'admin']);
-        if (null === $user) {
+        $user = $this->userManager->loadUserByIdentifier('admin');
+        if (!$user instanceof BizUser) {
             throw new ApiException('未找到用户名为 admin 的演示用户，请先导入测试数据。');
         }
 

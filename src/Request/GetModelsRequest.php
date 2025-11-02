@@ -11,6 +11,9 @@ use Tourze\SiliconFlowBundle\Exception\ApiException;
 
 final class GetModelsRequest extends AbstractSiliconFlowRequest
 {
+    /**
+     * @param array<string, mixed> $queryParams
+     */
     public function __construct(
         SiliconFlowConfig $config,
         private readonly ?string $type = null,
@@ -18,7 +21,7 @@ final class GetModelsRequest extends AbstractSiliconFlowRequest
         ?int $timeout = null,
     ) {
         if (null !== $this->type && !in_array($this->type, SiliconFlowModel::getSupportedTypes(), true)) {
-            throw new InvalidArgumentException(sprintf('Unsupported SiliconFlow model type: %s', $this->type));
+            throw new \InvalidArgumentException(sprintf('Unsupported SiliconFlow model type: %s', $this->type));
         }
 
         parent::__construct($config, $timeout ?? 30);

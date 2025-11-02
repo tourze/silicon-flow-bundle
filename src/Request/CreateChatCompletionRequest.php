@@ -146,7 +146,7 @@ final class CreateChatCompletionRequest extends AbstractSiliconFlowRequest
 
         foreach ($lines as $rawLine) {
             $decoded = $this->parseLineToJson($rawLine);
-            if ($decoded === null) {
+            if (null === $decoded) {
                 continue;
             }
 
@@ -173,9 +173,10 @@ final class CreateChatCompletionRequest extends AbstractSiliconFlowRequest
     private function splitContentIntoLines(string $content): array
     {
         $lines = preg_split('/\r?\n/', $content);
-        if ($lines === false) {
+        if (false === $lines) {
             $lines = [];
         }
+
         return $lines;
     }
 
@@ -289,6 +290,7 @@ final class CreateChatCompletionRequest extends AbstractSiliconFlowRequest
                 'finish_reason' => null,
             ];
         }
+
         return $choices;
     }
 
@@ -315,6 +317,7 @@ final class CreateChatCompletionRequest extends AbstractSiliconFlowRequest
     {
         /** @var array<string, mixed> $delta */
         $delta = isset($choice['delta']) && is_array($choice['delta']) ? $choice['delta'] : [];
+
         return $delta;
     }
 
@@ -327,6 +330,7 @@ final class CreateChatCompletionRequest extends AbstractSiliconFlowRequest
         if (!isset($choices[$index]['message'])) {
             $choices[$index]['message'] = ['role' => '', 'content' => ''];
         }
+
         return $choices;
     }
 
@@ -391,6 +395,7 @@ final class CreateChatCompletionRequest extends AbstractSiliconFlowRequest
         }
 
         $currentContent = $message['content'] ?? '';
+
         return is_string($currentContent) ? $currentContent : (is_scalar($currentContent) ? (string) $currentContent : '');
     }
 

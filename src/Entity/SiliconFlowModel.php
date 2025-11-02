@@ -84,7 +84,7 @@ class SiliconFlowModel implements \Stringable
     public function setType(string $type): void
     {
         if (!in_array($type, self::getSupportedTypes(), true)) {
-            throw new InvalidArgumentException(sprintf('Unsupported SiliconFlow model type: %s', $type));
+            throw new \InvalidArgumentException(sprintf('Unsupported SiliconFlow model type: %s', $type));
         }
 
         $this->type = $type;

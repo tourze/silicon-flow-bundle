@@ -38,4 +38,3 @@ class SiliconFlowVideoGenerationRepository extends ServiceEntityRepository
         }
     }
 }
-

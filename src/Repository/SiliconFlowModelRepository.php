@@ -46,11 +46,13 @@ class SiliconFlowModelRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('model')
             ->update()
             ->set('model.isActive', ':inactive')
-            ->setParameter('inactive', false);
+            ->setParameter('inactive', false)
+        ;
 
         if ([] !== $modelIds) {
             $qb->andWhere('model.modelId NOT IN (:ids)')
-                ->setParameter('ids', $modelIds);
+                ->setParameter('ids', $modelIds)
+            ;
         }
 
         $qb->getQuery()->execute();

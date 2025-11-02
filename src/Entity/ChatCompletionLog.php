@@ -23,7 +23,6 @@ use Tourze\SiliconFlowBundle\Repository\ChatCompletionLogRepository;
 #[ORM\Table(name: 'silicon_flow_chat_completion_logs', options: ['comment' => 'SiliconFlow Chat Completions 调用日志'])]
 class ChatCompletionLog implements \Stringable
 {
-
     use TimestampableAware;
 
     /**
@@ -195,5 +194,4 @@ class ChatCompletionLog implements \Stringable
     {
         $this->totalTokens = $totalTokens;
     }
-
 }

@@ -157,6 +157,7 @@ final class CreateChatMessagesRequest extends AbstractSiliconFlowRequest
         }
 
         $result['content'] = $contentBlocks;
+
         return $result;
     }
 
@@ -166,6 +167,7 @@ final class CreateChatMessagesRequest extends AbstractSiliconFlowRequest
     private function splitContentIntoLines(string $content): array
     {
         $lines = preg_split('/\r?\n/', $content);
+
         return false === $lines ? [] : $lines;
     }
 
@@ -229,8 +231,8 @@ final class CreateChatMessagesRequest extends AbstractSiliconFlowRequest
     {
         $decodedMessage = isset($decoded['message']) && is_array($decoded['message']) ? $decoded['message'] : [];
 
-        $result['id'] = $result['id'] ?? $decoded['id'] ?? ($decodedMessage['id'] ?? null);
-        $result['model'] = $result['model'] ?? $decoded['model'] ?? ($decodedMessage['model'] ?? null);
+        $result['id'] ??= $decoded['id'] ?? ($decodedMessage['id'] ?? null);
+        $result['model'] ??= $decoded['model'] ?? ($decodedMessage['model'] ?? null);
 
         $role = $decoded['role'] ?? $decodedMessage['role'] ?? $result['role'];
         if (is_string($role)) {
@@ -293,6 +295,7 @@ final class CreateChatMessagesRequest extends AbstractSiliconFlowRequest
     {
         if ('text' !== $block['type']) {
             $contentBlocks[] = $block;
+
             return $contentBlocks;
         }
 
