@@ -17,26 +17,26 @@ class SiliconFlowConfigRepositoryTest extends AbstractIntegrationTestCase
 
     protected function onSetUp(): void
     {
-        $this->repository = $this->getService(SiliconFlowConfigRepository::class);
+        $this->repository = self::getService(SiliconFlowConfigRepository::class);
     }
 
     public function testInstantiation(): void
     {
-        $this->assertInstanceOf(SiliconFlowConfigRepository::class, $this->repository);
+        self::assertInstanceOf(SiliconFlowConfigRepository::class, $this->repository);
     }
 
     public function testCount(): void
     {
         $count = $this->repository->count([]);
-        $this->assertIsInt($count);
-        $this->assertGreaterThanOrEqual(0, $count);
+        self::assertIsInt($count);
+        self::assertGreaterThanOrEqual(0, $count);
     }
 
     public function testFindActiveConfig(): void
     {
         $config = $this->repository->findActiveConfig();
         if ($config !== null) {
-            $this->assertInstanceOf(\Tourze\SiliconFlowBundle\Entity\SiliconFlowConfig::class, $config);
+            self::assertInstanceOf(\Tourze\SiliconFlowBundle\Entity\SiliconFlowConfig::class, $config);
         }
         // else 分支中 $config 已被类型系统收窄为 null，无需额外断言
     }
@@ -44,14 +44,14 @@ class SiliconFlowConfigRepositoryTest extends AbstractIntegrationTestCase
     public function testFindActiveConfigs(): void
     {
         $configs = $this->repository->findActiveConfigs(10);
-        $this->assertIsArray($configs);
-        $this->assertLessThanOrEqual(10, count($configs));
+        self::assertIsArray($configs);
+        self::assertLessThanOrEqual(10, count($configs));
     }
 
     public function testFindActiveConfigsWithDefaultLimit(): void
     {
         $configs = $this->repository->findActiveConfigs();
-        $this->assertIsArray($configs);
-        $this->assertLessThanOrEqual(50, count($configs));
+        self::assertIsArray($configs);
+        self::assertLessThanOrEqual(50, count($configs));
     }
 }

@@ -25,8 +25,8 @@ class ApiExceptionTest extends AbstractIntegrationTestCase
     public function testInstantiation(): void
     {
         $exception = new ApiException();
-        $this->assertInstanceOf(ApiException::class, $exception);
-        $this->assertInstanceOf(\RuntimeException::class, $exception);
+        self::assertInstanceOf(ApiException::class, $exception);
+        self::assertInstanceOf(\RuntimeException::class, $exception);
     }
 
     /**
@@ -35,7 +35,7 @@ class ApiExceptionTest extends AbstractIntegrationTestCase
     public function testExceptionIsFinal(): void
     {
         $reflection = new \ReflectionClass(ApiException::class);
-        $this->assertTrue($reflection->isFinal(), 'ApiException should be final');
+        self::assertTrue($reflection->isFinal(), 'ApiException should be final');
     }
 
     /**
@@ -44,9 +44,9 @@ class ApiExceptionTest extends AbstractIntegrationTestCase
     public function testExceptionInheritance(): void
     {
         $exception = new ApiException();
-        $this->assertInstanceOf(\RuntimeException::class, $exception);
-        $this->assertInstanceOf(\Exception::class, $exception);
-        $this->assertInstanceOf(\Throwable::class, $exception);
+        self::assertInstanceOf(\RuntimeException::class, $exception);
+        self::assertInstanceOf(\Exception::class, $exception);
+        self::assertInstanceOf(\Throwable::class, $exception);
     }
 
     /**
@@ -57,7 +57,7 @@ class ApiExceptionTest extends AbstractIntegrationTestCase
         $message = 'SiliconFlow API 调用失败';
         $exception = new ApiException($message);
 
-        $this->assertSame($message, $exception->getMessage());
+        self::assertSame($message, $exception->getMessage());
     }
 
     /**
@@ -69,8 +69,8 @@ class ApiExceptionTest extends AbstractIntegrationTestCase
         $code = 408;
         $exception = new ApiException($message, $code);
 
-        $this->assertSame($message, $exception->getMessage());
-        $this->assertSame($code, $exception->getCode());
+        self::assertSame($message, $exception->getMessage());
+        self::assertSame($code, $exception->getCode());
     }
 
     /**
@@ -84,9 +84,9 @@ class ApiExceptionTest extends AbstractIntegrationTestCase
         $message = 'SiliconFlow API 不可用';
         $exception = new ApiException($message, 0, $previous);
 
-        $this->assertSame($message, $exception->getMessage());
-        $this->assertSame($previous, $exception->getPrevious());
-        $this->assertSame($previousMessage, $exception->getPrevious()->getMessage());
+        self::assertSame($message, $exception->getMessage());
+        self::assertSame($previous, $exception->getPrevious());
+        self::assertSame($previousMessage, $exception->getPrevious()->getMessage());
     }
 
     /**
@@ -95,7 +95,7 @@ class ApiExceptionTest extends AbstractIntegrationTestCase
     public function testExceptionWithEmptyMessage(): void
     {
         $exception = new ApiException('');
-        $this->assertSame('', $exception->getMessage());
+        self::assertSame('', $exception->getMessage());
     }
 
     /**
@@ -121,8 +121,8 @@ class ApiExceptionTest extends AbstractIntegrationTestCase
         try {
             throw new ApiException($message);
         } catch (\RuntimeException $e) {
-            $this->assertInstanceOf(ApiException::class, $e);
-            $this->assertSame($message, $e->getMessage());
+            self::assertInstanceOf(ApiException::class, $e);
+            self::assertSame($message, $e->getMessage());
         }
     }
 
@@ -136,8 +136,8 @@ class ApiExceptionTest extends AbstractIntegrationTestCase
         try {
             throw new ApiException($message);
         } catch (\Exception $e) {
-            $this->assertInstanceOf(ApiException::class, $e);
-            $this->assertSame($message, $e->getMessage());
+            self::assertInstanceOf(ApiException::class, $e);
+            self::assertSame($message, $e->getMessage());
         }
     }
 
@@ -152,9 +152,9 @@ class ApiExceptionTest extends AbstractIntegrationTestCase
 
         $string = (string) $exception;
 
-        $this->assertStringContainsString('ApiException', $string);
-        $this->assertStringContainsString($message, $string);
-        $this->assertStringContainsString((string) $code, $string);
+        self::assertStringContainsString('ApiException', $string);
+        self::assertStringContainsString($message, $string);
+        self::assertStringContainsString((string) $code, $string);
     }
 
     /**
@@ -165,14 +165,14 @@ class ApiExceptionTest extends AbstractIntegrationTestCase
         $exception = new ApiException('测试调用栈');
 
         $trace = $exception->getTrace();
-        $this->assertIsArray($trace);
+        self::assertIsArray($trace);
 
         $file = $exception->getFile();
-        $this->assertIsString($file);
-        $this->assertStringEndsWith('ApiExceptionTest.php', $file);
+        self::assertIsString($file);
+        self::assertStringEndsWith('ApiExceptionTest.php', $file);
 
         $line = $exception->getLine();
-        $this->assertIsInt($line);
-        $this->assertGreaterThan(0, $line);
+        self::assertIsInt($line);
+        self::assertGreaterThan(0, $line);
     }
 }

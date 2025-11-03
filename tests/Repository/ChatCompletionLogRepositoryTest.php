@@ -17,32 +17,32 @@ class ChatCompletionLogRepositoryTest extends AbstractIntegrationTestCase
 
     protected function onSetUp(): void
     {
-        $this->repository = $this->getService(ChatCompletionLogRepository::class);
+        $this->repository = self::getService(ChatCompletionLogRepository::class);
     }
 
     public function testInstantiation(): void
     {
-        $this->assertInstanceOf(ChatCompletionLogRepository::class, $this->repository);
+        self::assertInstanceOf(ChatCompletionLogRepository::class, $this->repository);
     }
 
     public function testCount(): void
     {
         $count = $this->repository->count([]);
-        $this->assertIsInt($count);
-        $this->assertGreaterThanOrEqual(0, $count);
+        self::assertIsInt($count);
+        self::assertGreaterThanOrEqual(0, $count);
     }
 
     public function testFindRecent(): void
     {
         $results = $this->repository->findRecent(10);
-        $this->assertIsArray($results);
-        $this->assertLessThanOrEqual(10, count($results));
+        self::assertIsArray($results);
+        self::assertLessThanOrEqual(10, count($results));
     }
 
     public function testFindRecentWithDefaultLimit(): void
     {
         $results = $this->repository->findRecent();
-        $this->assertIsArray($results);
-        $this->assertLessThanOrEqual(20, count($results));
+        self::assertIsArray($results);
+        self::assertLessThanOrEqual(20, count($results));
     }
 }

@@ -69,6 +69,6 @@ class AdminMenuTest extends AbstractEasyAdminMenuTestCase
      */
     public function testServiceInstantiation(): void
     {
-        $this->assertInstanceOf(AdminMenu::class, $this->adminMenu);
+        self::assertInstanceOf(AdminMenu::class, $this->adminMenu);
     }
 }

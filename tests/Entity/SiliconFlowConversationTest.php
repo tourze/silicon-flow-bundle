@@ -31,9 +31,9 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
      */
     public function testInstantiation(): void
     {
-        $this->assertInstanceOf(SiliconFlowConversation::class, $this->entity);
-        $this->assertNull($this->entity->getId());
-        $this->assertSame(SiliconFlowConversation::TYPE_SINGLE, $this->entity->getConversationType());
+        self::assertInstanceOf(SiliconFlowConversation::class, $this->entity);
+        self::assertNull($this->entity->getId());
+        self::assertSame(SiliconFlowConversation::TYPE_SINGLE, $this->entity->getConversationType());
     }
 
     /**
@@ -41,8 +41,8 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
      */
     public function testConstants(): void
     {
-        $this->assertSame('single', SiliconFlowConversation::TYPE_SINGLE);
-        $this->assertSame('continuous', SiliconFlowConversation::TYPE_CONTINUOUS);
+        self::assertSame('single', SiliconFlowConversation::TYPE_SINGLE);
+        self::assertSame('continuous', SiliconFlowConversation::TYPE_CONTINUOUS);
     }
 
     /**
@@ -52,14 +52,14 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
     {
         $shortQuestion = 'Hello World';
         $this->entity->setQuestion($shortQuestion);
-        $this->assertSame($shortQuestion, (string) $this->entity);
+        self::assertSame($shortQuestion, (string) $this->entity);
 
         // 测试长文本截断
         $longQuestion = str_repeat('这是一个非常长的问题，', 20);
         $this->entity->setQuestion($longQuestion);
         $result = (string) $this->entity;
-        $this->assertStringEndsWith('...', $result);
-        $this->assertLessThanOrEqual(53, mb_strlen($result)); // 50 + '...'
+        self::assertStringEndsWith('...', $result);
+        self::assertLessThanOrEqual(53, mb_strlen($result)); // 50 + '...'
     }
 
     /**
@@ -68,10 +68,10 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
     public function testConversationType(): void
     {
         $this->entity->setConversationType(SiliconFlowConversation::TYPE_CONTINUOUS);
-        $this->assertSame(SiliconFlowConversation::TYPE_CONTINUOUS, $this->entity->getConversationType());
+        self::assertSame(SiliconFlowConversation::TYPE_CONTINUOUS, $this->entity->getConversationType());
 
         $this->entity->setConversationType(SiliconFlowConversation::TYPE_SINGLE);
-        $this->assertSame(SiliconFlowConversation::TYPE_SINGLE, $this->entity->getConversationType());
+        self::assertSame(SiliconFlowConversation::TYPE_SINGLE, $this->entity->getConversationType());
     }
 
     /**
@@ -81,7 +81,7 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
     {
         $model = 'gpt-4-turbo';
         $this->entity->setModel($model);
-        $this->assertSame($model, $this->entity->getModel());
+        self::assertSame($model, $this->entity->getModel());
     }
 
     /**
@@ -91,7 +91,7 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
     {
         $question = '你好，请帮我解答一个问题';
         $this->entity->setQuestion($question);
-        $this->assertSame($question, $this->entity->getQuestion());
+        self::assertSame($question, $this->entity->getQuestion());
     }
 
     /**
@@ -101,10 +101,10 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
     {
         $answer = '当然可以，我很乐意帮助您';
         $this->entity->setAnswer($answer);
-        $this->assertSame($answer, $this->entity->getAnswer());
+        self::assertSame($answer, $this->entity->getAnswer());
 
         $this->entity->setAnswer(null);
-        $this->assertNull($this->entity->getAnswer());
+        self::assertNull($this->entity->getAnswer());
     }
 
     /**
@@ -113,7 +113,7 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
     public function testSender(): void
     {
         $this->entity->setSender($this->mockUser);
-        $this->assertSame($this->mockUser, $this->entity->getSender());
+        self::assertSame($this->mockUser, $this->entity->getSender());
     }
 
     /**
@@ -123,10 +123,10 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
     {
         $contextConversation = new SiliconFlowConversation();
         $this->entity->setContext($contextConversation);
-        $this->assertSame($contextConversation, $this->entity->getContext());
+        self::assertSame($contextConversation, $this->entity->getContext());
 
         $this->entity->setContext(null);
-        $this->assertNull($this->entity->getContext());
+        self::assertNull($this->entity->getContext());
     }
 
     /**
@@ -136,10 +136,10 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
     {
         $snapshot = '之前的对话历史快照';
         $this->entity->setContextSnapshot($snapshot);
-        $this->assertSame($snapshot, $this->entity->getContextSnapshot());
+        self::assertSame($snapshot, $this->entity->getContextSnapshot());
 
         $this->entity->setContextSnapshot(null);
-        $this->assertNull($this->entity->getContextSnapshot());
+        self::assertNull($this->entity->getContextSnapshot());
     }
 
     /**
@@ -157,12 +157,12 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
         $this->entity->setContext($contextConversation);
         $this->entity->setContextSnapshot('历史快照');
 
-        $this->assertSame(SiliconFlowConversation::TYPE_CONTINUOUS, $this->entity->getConversationType());
-        $this->assertSame('gpt-4', $this->entity->getModel());
-        $this->assertSame('这是一个测试问题', $this->entity->getQuestion());
-        $this->assertSame('这是一个测试回答', $this->entity->getAnswer());
-        $this->assertSame($this->mockUser, $this->entity->getSender());
-        $this->assertSame($contextConversation, $this->entity->getContext());
-        $this->assertSame('历史快照', $this->entity->getContextSnapshot());
+        self::assertSame(SiliconFlowConversation::TYPE_CONTINUOUS, $this->entity->getConversationType());
+        self::assertSame('gpt-4', $this->entity->getModel());
+        self::assertSame('这是一个测试问题', $this->entity->getQuestion());
+        self::assertSame('这是一个测试回答', $this->entity->getAnswer());
+        self::assertSame($this->mockUser, $this->entity->getSender());
+        self::assertSame($contextConversation, $this->entity->getContext());
+        self::assertSame('历史快照', $this->entity->getContextSnapshot());
     }
 }

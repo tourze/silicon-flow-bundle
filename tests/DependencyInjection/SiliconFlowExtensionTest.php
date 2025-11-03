@@ -26,10 +26,14 @@ class SiliconFlowExtensionTest extends AbstractDependencyInjectionExtensionTestC
         $this->container = new ContainerBuilder();
 
         // 备份原始环境变量
+        $apiKey = getenv('SILICON_FLOW_API_KEY');
+        $baseUrl = getenv('SILICON_FLOW_BASE_URL');
+        $timeout = getenv('SILICON_FLOW_REQUEST_TIMEOUT');
+
         $this->originalEnv = [
-            'SILICON_FLOW_API_KEY' => (string) (getenv('SILICON_FLOW_API_KEY') ?: ''),
-            'SILICON_FLOW_BASE_URL' => (string) (getenv('SILICON_FLOW_BASE_URL') ?: ''),
-            'SILICON_FLOW_REQUEST_TIMEOUT' => (string) (getenv('SILICON_FLOW_REQUEST_TIMEOUT') ?: ''),
+            'SILICON_FLOW_API_KEY' => false !== $apiKey ? $apiKey : '',
+            'SILICON_FLOW_BASE_URL' => false !== $baseUrl ? $baseUrl : '',
+            'SILICON_FLOW_REQUEST_TIMEOUT' => false !== $timeout ? $timeout : '',
         ];
     }
 
@@ -50,7 +54,7 @@ class SiliconFlowExtensionTest extends AbstractDependencyInjectionExtensionTestC
      */
     public function testInstantiation(): void
     {
-        $this->assertInstanceOf(SiliconFlowExtension::class, $this->extension);
+        self::assertInstanceOf(SiliconFlowExtension::class, $this->extension);
     }
 
     /**
@@ -59,7 +63,7 @@ class SiliconFlowExtensionTest extends AbstractDependencyInjectionExtensionTestC
     public function testExtensionIsFinal(): void
     {
         $reflection = new \ReflectionClass(SiliconFlowExtension::class);
-        $this->assertTrue($reflection->isFinal(), 'SiliconFlowExtension should be final');
+        self::assertTrue($reflection->isFinal(), 'SiliconFlowExtension should be final');
     }
 
     /**
@@ -73,8 +77,8 @@ class SiliconFlowExtensionTest extends AbstractDependencyInjectionExtensionTestC
 
         $configDir = $method->invoke($this->extension);
 
-        $this->assertIsString($configDir);
-        $this->assertStringEndsWith('/Resources/config', $configDir);
+        self::assertIsString($configDir);
+        self::assertStringEndsWith('/Resources/config', $configDir);
     }
 
     /**
@@ -92,14 +96,14 @@ class SiliconFlowExtensionTest extends AbstractDependencyInjectionExtensionTestC
         $this->extension->load($configs, $this->container);
 
         // 检查参数是否正确设置
-        $this->assertTrue($this->container->hasParameter('tourze_silicon_flow.api_key'));
-        $this->assertTrue($this->container->hasParameter('tourze_silicon_flow.base_url'));
-        $this->assertTrue($this->container->hasParameter('tourze_silicon_flow.request_timeout'));
+        self::assertTrue($this->container->hasParameter('tourze_silicon_flow.api_key'));
+        self::assertTrue($this->container->hasParameter('tourze_silicon_flow.base_url'));
+        self::assertTrue($this->container->hasParameter('tourze_silicon_flow.request_timeout'));
 
         // 检查默认值
-        $this->assertSame('', $this->container->getParameter('tourze_silicon_flow.api_key'));
-        $this->assertSame('https://api.siliconflow.cn', $this->container->getParameter('tourze_silicon_flow.base_url'));
-        $this->assertSame(30, $this->container->getParameter('tourze_silicon_flow.request_timeout'));
+        self::assertSame('', $this->container->getParameter('tourze_silicon_flow.api_key'));
+        self::assertSame('https://api.siliconflow.cn', $this->container->getParameter('tourze_silicon_flow.base_url'));
+        self::assertSame(30, $this->container->getParameter('tourze_silicon_flow.request_timeout'));
     }
 
     /**
@@ -116,9 +120,9 @@ class SiliconFlowExtensionTest extends AbstractDependencyInjectionExtensionTestC
         $this->extension->load($configs, $this->container);
 
         // 检查环境变量值
-        $this->assertSame('sk-env123', $this->container->getParameter('tourze_silicon_flow.api_key'));
-        $this->assertSame('https://env.api.com', $this->container->getParameter('tourze_silicon_flow.base_url'));
-        $this->assertSame(60, $this->container->getParameter('tourze_silicon_flow.request_timeout'));
+        self::assertSame('sk-env123', $this->container->getParameter('tourze_silicon_flow.api_key'));
+        self::assertSame('https://env.api.com', $this->container->getParameter('tourze_silicon_flow.base_url'));
+        self::assertSame(60, $this->container->getParameter('tourze_silicon_flow.request_timeout'));
     }
 
     /**
@@ -135,9 +139,9 @@ class SiliconFlowExtensionTest extends AbstractDependencyInjectionExtensionTestC
         $this->extension->load($configs, $this->container);
 
         // 部分配置应该使用默认值填充其他字段
-        $this->assertSame('sk-partial', $this->container->getParameter('tourze_silicon_flow.api_key'));
-        $this->assertSame('https://api.siliconflow.cn', $this->container->getParameter('tourze_silicon_flow.base_url'));
-        $this->assertSame(30, $this->container->getParameter('tourze_silicon_flow.request_timeout'));
+        self::assertSame('sk-partial', $this->container->getParameter('tourze_silicon_flow.api_key'));
+        self::assertSame('https://api.siliconflow.cn', $this->container->getParameter('tourze_silicon_flow.base_url'));
+        self::assertSame(30, $this->container->getParameter('tourze_silicon_flow.request_timeout'));
     }
 
     /**
@@ -152,8 +156,8 @@ class SiliconFlowExtensionTest extends AbstractDependencyInjectionExtensionTestC
         $this->extension->load($configs, $this->container);
 
         // 字符串应该被转换为整数
-        $this->assertIsInt($this->container->getParameter('tourze_silicon_flow.request_timeout'));
-        $this->assertSame(120, $this->container->getParameter('tourze_silicon_flow.request_timeout'));
+        self::assertIsInt($this->container->getParameter('tourze_silicon_flow.request_timeout'));
+        self::assertSame(120, $this->container->getParameter('tourze_silicon_flow.request_timeout'));
     }
 
     /**
@@ -168,7 +172,7 @@ class SiliconFlowExtensionTest extends AbstractDependencyInjectionExtensionTestC
         $this->extension->load($configs, $this->container);
 
         // 无效值应该被转换为0（int类型转换结果）
-        $this->assertSame(0, $this->container->getParameter('tourze_silicon_flow.request_timeout'));
+        self::assertSame(0, $this->container->getParameter('tourze_silicon_flow.request_timeout'));
     }
 
     /**
@@ -184,9 +188,9 @@ class SiliconFlowExtensionTest extends AbstractDependencyInjectionExtensionTestC
 
         $this->extension->load($configs, $this->container);
 
-        $this->assertSame('', $this->container->getParameter('tourze_silicon_flow.api_key'));
-        $this->assertSame('', $this->container->getParameter('tourze_silicon_flow.base_url'));
-        $this->assertSame(0, $this->container->getParameter('tourze_silicon_flow.request_timeout'));
+        self::assertSame('', $this->container->getParameter('tourze_silicon_flow.api_key'));
+        self::assertSame('', $this->container->getParameter('tourze_silicon_flow.base_url'));
+        self::assertSame(0, $this->container->getParameter('tourze_silicon_flow.request_timeout'));
     }
 
     /**
@@ -207,7 +211,7 @@ class SiliconFlowExtensionTest extends AbstractDependencyInjectionExtensionTestC
         $this->extension->load($configs, $this->container);
 
         // 应该使用环境变量值，忽略配置数组
-        $this->assertSame('sk-from-env', $this->container->getParameter('tourze_silicon_flow.api_key'));
-        $this->assertSame('https://api.siliconflow.cn', $this->container->getParameter('tourze_silicon_flow.base_url'));
+        self::assertSame('sk-from-env', $this->container->getParameter('tourze_silicon_flow.api_key'));
+        self::assertSame('https://api.siliconflow.cn', $this->container->getParameter('tourze_silicon_flow.base_url'));
     }
 }

@@ -28,12 +28,12 @@ class SiliconFlowModelTest extends AbstractIntegrationTestCase
      */
     public function testInstantiation(): void
     {
-        $this->assertInstanceOf(SiliconFlowModel::class, $this->entity);
-        $this->assertNull($this->entity->getId());
-        $this->assertSame('', $this->entity->getModelId());
-        $this->assertSame('model', $this->entity->getObjectType());
-        $this->assertTrue($this->entity->isActive());
-        $this->assertNull($this->entity->getMetadata());
+        self::assertInstanceOf(SiliconFlowModel::class, $this->entity);
+        self::assertNull($this->entity->getId());
+        self::assertSame('', $this->entity->getModelId());
+        self::assertSame('model', $this->entity->getObjectType());
+        self::assertTrue($this->entity->isActive());
+        self::assertNull($this->entity->getMetadata());
     }
 
     /**
@@ -44,7 +44,7 @@ class SiliconFlowModelTest extends AbstractIntegrationTestCase
         $this->entity->setModelId('claude-3-5-haiku-20241022');
 
         $result = (string) $this->entity;
-        $this->assertSame('claude-3-5-haiku-20241022', $result);
+        self::assertSame('claude-3-5-haiku-20241022', $result);
     }
 
     /**
@@ -54,7 +54,7 @@ class SiliconFlowModelTest extends AbstractIntegrationTestCase
     {
         $modelId = 'claude-3-5-sonnet-20241022';
         $this->entity->setModelId($modelId);
-        $this->assertSame($modelId, $this->entity->getModelId());
+        self::assertSame($modelId, $this->entity->getModelId());
     }
 
     /**
@@ -64,7 +64,7 @@ class SiliconFlowModelTest extends AbstractIntegrationTestCase
     {
         $objectType = 'chat.completion';
         $this->entity->setObjectType($objectType);
-        $this->assertSame($objectType, $this->entity->getObjectType());
+        self::assertSame($objectType, $this->entity->getObjectType());
     }
 
     /**
@@ -73,15 +73,15 @@ class SiliconFlowModelTest extends AbstractIntegrationTestCase
     public function testIsActive(): void
     {
         // 默认为true
-        $this->assertTrue($this->entity->isActive());
+        self::assertTrue($this->entity->isActive());
 
         // 设置为false
         $this->entity->setIsActive(false);
-        $this->assertFalse($this->entity->isActive());
+        self::assertFalse($this->entity->isActive());
 
         // 设置为true
         $this->entity->setIsActive(true);
-        $this->assertTrue($this->entity->isActive());
+        self::assertTrue($this->entity->isActive());
     }
 
     /**
@@ -96,11 +96,11 @@ class SiliconFlowModelTest extends AbstractIntegrationTestCase
         ];
 
         $this->entity->setMetadata($metadata);
-        $this->assertSame($metadata, $this->entity->getMetadata());
+        self::assertSame($metadata, $this->entity->getMetadata());
 
         // 测试null值
         $this->entity->setMetadata(null);
-        $this->assertNull($this->entity->getMetadata());
+        self::assertNull($this->entity->getMetadata());
     }
 
     /**
@@ -109,10 +109,10 @@ class SiliconFlowModelTest extends AbstractIntegrationTestCase
     public function testTimestampableTrait(): void
     {
         // 验证实体具有timestampable方法
-        $this->assertTrue(method_exists($this->entity, 'getCreatedAt'));
-        $this->assertTrue(method_exists($this->entity, 'getUpdatedAt'));
-        $this->assertTrue(method_exists($this->entity, 'setCreatedAt'));
-        $this->assertTrue(method_exists($this->entity, 'setUpdatedAt'));
+        self::assertTrue(method_exists($this->entity, 'getCreatedAt'));
+        self::assertTrue(method_exists($this->entity, 'getUpdatedAt'));
+        self::assertTrue(method_exists($this->entity, 'setCreatedAt'));
+        self::assertTrue(method_exists($this->entity, 'setUpdatedAt'));
     }
 
     /**
@@ -120,7 +120,7 @@ class SiliconFlowModelTest extends AbstractIntegrationTestCase
      */
     public function testStringableInterface(): void
     {
-        $this->assertInstanceOf(\Stringable::class, $this->entity);
+        self::assertInstanceOf(\Stringable::class, $this->entity);
     }
 
     /**
@@ -130,9 +130,9 @@ class SiliconFlowModelTest extends AbstractIntegrationTestCase
     {
         $entity = new SiliconFlowModel();
 
-        $this->assertSame('', $entity->getModelId());
-        $this->assertSame('model', $entity->getObjectType());
-        $this->assertTrue($entity->isActive());
-        $this->assertNull($entity->getMetadata());
+        self::assertSame('', $entity->getModelId());
+        self::assertSame('model', $entity->getObjectType());
+        self::assertTrue($entity->isActive());
+        self::assertNull($entity->getMetadata());
     }
 }

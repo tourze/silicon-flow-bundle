@@ -29,21 +29,21 @@ class CreateChatCompletionRequestTest extends TestCase
     {
         $messages = [['role' => 'user', 'content' => 'Hello']];
         $request = new CreateChatCompletionRequest($this->config, 'test-model', $messages);
-        $this->assertInstanceOf(CreateChatCompletionRequest::class, $request);
+        self::assertInstanceOf(CreateChatCompletionRequest::class, $request);
     }
 
     public function testGetMethod(): void
     {
         $messages = [['role' => 'user', 'content' => 'Hello']];
         $request = new CreateChatCompletionRequest($this->config, 'test-model', $messages);
-        $this->assertSame('POST', $request->getRequestMethod());
+        self::assertSame('POST', $request->getRequestMethod());
     }
 
     public function testGetPath(): void
     {
         $messages = [['role' => 'user', 'content' => 'Hello']];
         $request = new CreateChatCompletionRequest($this->config, 'test-model', $messages);
-        $this->assertSame('/v1/chat/completions', $request->getRequestPath());
+        self::assertSame('/v1/chat/completions', $request->getRequestPath());
     }
 
     public function testGetHeaders(): void
@@ -52,15 +52,15 @@ class CreateChatCompletionRequestTest extends TestCase
         $request = new CreateChatCompletionRequest($this->config, 'test-model', $messages);
         $options = $request->getRequestOptions();
 
-        $this->assertIsArray($options);
-        $this->assertArrayHasKey('headers', $options);
+        self::assertIsArray($options);
+        self::assertArrayHasKey('headers', $options);
 
         $headers = $options['headers'];
-        $this->assertIsArray($headers);
-        $this->assertArrayHasKey('Content-Type', $headers);
-        $this->assertSame('application/json', $headers['Content-Type']);
-        $this->assertArrayHasKey('Authorization', $headers);
-        $this->assertSame('Bearer test-token', $headers['Authorization']);
+        self::assertIsArray($headers);
+        self::assertArrayHasKey('Content-Type', $headers);
+        self::assertSame('application/json', $headers['Content-Type']);
+        self::assertArrayHasKey('Authorization', $headers);
+        self::assertSame('Bearer test-token', $headers['Authorization']);
     }
 
     public function testGetBody(): void
@@ -72,13 +72,13 @@ class CreateChatCompletionRequestTest extends TestCase
         $request = new CreateChatCompletionRequest($this->config, 'claude-3-5-sonnet-20241022', $messages);
         $options = $request->getRequestOptions();
 
-        $this->assertArrayHasKey('json', $options);
+        self::assertArrayHasKey('json', $options);
         $decoded = $options['json'];
-        $this->assertIsArray($decoded);
-        $this->assertArrayHasKey('model', $decoded);
-        $this->assertArrayHasKey('messages', $decoded);
-        $this->assertSame('claude-3-5-sonnet-20241022', $decoded['model']);
-        $this->assertSame($messages, $decoded['messages']);
+        self::assertIsArray($decoded);
+        self::assertArrayHasKey('model', $decoded);
+        self::assertArrayHasKey('messages', $decoded);
+        self::assertSame('claude-3-5-sonnet-20241022', $decoded['model']);
+        self::assertSame($messages, $decoded['messages']);
     }
 
     public function testGetBodyWithOptionalParams(): void
@@ -96,15 +96,15 @@ class CreateChatCompletionRequestTest extends TestCase
         $request = new CreateChatCompletionRequest($this->config, 'claude-3-5-haiku-20241022', $messages, $options);
         $requestOptions = $request->getRequestOptions();
 
-        $this->assertArrayHasKey('json', $requestOptions);
+        self::assertArrayHasKey('json', $requestOptions);
         $decoded = $requestOptions['json'];
-        $this->assertIsArray($decoded);
+        self::assertIsArray($decoded);
 
-        $this->assertArrayHasKey('max_tokens', $decoded);
-        $this->assertArrayHasKey('temperature', $decoded);
-        $this->assertArrayHasKey('stream', $decoded);
-        $this->assertSame(1000, $decoded['max_tokens']);
-        $this->assertSame(0.7, $decoded['temperature']);
-        $this->assertTrue($decoded['stream']);
+        self::assertArrayHasKey('max_tokens', $decoded);
+        self::assertArrayHasKey('temperature', $decoded);
+        self::assertArrayHasKey('stream', $decoded);
+        self::assertSame(1000, $decoded['max_tokens']);
+        self::assertSame(0.7, $decoded['temperature']);
+        self::assertTrue($decoded['stream']);
     }
 }

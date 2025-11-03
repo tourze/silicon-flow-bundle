@@ -17,27 +17,27 @@ class SiliconFlowModelRepositoryTest extends AbstractIntegrationTestCase
 
     protected function onSetUp(): void
     {
-        $this->repository = $this->getService(SiliconFlowModelRepository::class);
+        $this->repository = self::getService(SiliconFlowModelRepository::class);
     }
 
     public function testInstantiation(): void
     {
-        $this->assertInstanceOf(SiliconFlowModelRepository::class, $this->repository);
+        self::assertInstanceOf(SiliconFlowModelRepository::class, $this->repository);
     }
 
     public function testCount(): void
     {
         $count = $this->repository->count([]);
-        $this->assertIsInt($count);
-        $this->assertGreaterThanOrEqual(0, $count);
+        self::assertIsInt($count);
+        self::assertGreaterThanOrEqual(0, $count);
     }
 
     public function testFindActiveModels(): void
     {
         $models = $this->repository->findActiveModels();
-        $this->assertIsArray($models);
+        self::assertIsArray($models);
         foreach ($models as $model) {
-            $this->assertInstanceOf(\Tourze\SiliconFlowBundle\Entity\SiliconFlowModel::class, $model);
+            self::assertInstanceOf(\Tourze\SiliconFlowBundle\Entity\SiliconFlowModel::class, $model);
         }
     }
 }

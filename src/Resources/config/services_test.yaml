@@ -5,5 +5,9 @@ services:
     autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
     public: true
 
+  # 测试专用的FileService替身，避免依赖注入失败
+  Tourze\FileStorageBundle\Service\FileService:
+    class: Tourze\SiliconFlowBundle\Tests\Fixtures\FakeFileService
+
   Tourze\SiliconFlowBundle\DataFixtures\:
     resource: '../../DataFixtures/'

@@ -20,17 +20,17 @@ class AttributeControllerLoaderTest extends AbstractIntegrationTestCase
 
     protected function onSetUp(): void
     {
-        $this->loader = $this->getService(AttributeControllerLoader::class);
+        $this->loader = self::getService(AttributeControllerLoader::class);
     }
 
     public function testInstantiation(): void
     {
-        $this->assertInstanceOf(AttributeControllerLoader::class, $this->loader);
+        self::assertInstanceOf(AttributeControllerLoader::class, $this->loader);
     }
 
     public function testImplementsInterface(): void
     {
-        $this->assertInstanceOf(
+        self::assertInstanceOf(
             \Tourze\RoutingAutoLoaderBundle\Service\RoutingAutoLoaderInterface::class,
             $this->loader
         );
@@ -40,10 +40,10 @@ class AttributeControllerLoaderTest extends AbstractIntegrationTestCase
     {
         // 测试加载控制器
         $routes = $this->loader->autoload();
-        $this->assertInstanceOf(\Symfony\Component\Routing\RouteCollection::class, $routes);
+        self::assertInstanceOf(\Symfony\Component\Routing\RouteCollection::class, $routes);
 
         // 验证返回的是路由集合
-        $this->assertGreaterThanOrEqual(0, $routes->count());
+        self::assertGreaterThanOrEqual(0, $routes->count());
     }
 
     public function testGetControllersDirectory(): void
@@ -56,10 +56,10 @@ class AttributeControllerLoaderTest extends AbstractIntegrationTestCase
             $method->setAccessible(true);
             $directory = $method->invoke($this->loader);
 
-            $this->assertIsString($directory);
-            $this->assertStringContainsString('Controller', $directory);
+            self::assertIsString($directory);
+            self::assertStringContainsString('Controller', $directory);
         } else {
-            $this->markTestSkipped('getControllersDirectory method not found');
+            self::markTestSkipped('getControllersDirectory method not found');
         }
     }
 
@@ -73,10 +73,10 @@ class AttributeControllerLoaderTest extends AbstractIntegrationTestCase
             $method->setAccessible(true);
             $namespace = $method->invoke($this->loader);
 
-            $this->assertIsString($namespace);
-            $this->assertStringContainsString('SiliconFlowBundle', $namespace);
+            self::assertIsString($namespace);
+            self::assertStringContainsString('SiliconFlowBundle', $namespace);
         } else {
-            $this->markTestSkipped('getNamespace method not found');
+            self::markTestSkipped('getNamespace method not found');
         }
     }
 }

@@ -28,8 +28,8 @@ class ChatCompletionLogTest extends AbstractIntegrationTestCase
      */
     public function testInstantiation(): void
     {
-        $this->assertInstanceOf(ChatCompletionLog::class, $this->entity);
-        $this->assertNull($this->entity->getId());
+        self::assertInstanceOf(ChatCompletionLog::class, $this->entity);
+        self::assertNull($this->entity->getId());
     }
 
     /**
@@ -38,7 +38,7 @@ class ChatCompletionLogTest extends AbstractIntegrationTestCase
     public function testToString(): void
     {
         $this->entity->setModel('gpt-3.5-turbo');
-        $this->assertSame('gpt-3.5-turbo', (string) $this->entity);
+        self::assertSame('gpt-3.5-turbo', (string) $this->entity);
     }
 
     /**
@@ -48,10 +48,10 @@ class ChatCompletionLogTest extends AbstractIntegrationTestCase
     {
         $requestId = 'req_123456789';
         $this->entity->setRequestId($requestId);
-        $this->assertSame($requestId, $this->entity->getRequestId());
+        self::assertSame($requestId, $this->entity->getRequestId());
 
         $this->entity->setRequestId(null);
-        $this->assertNull($this->entity->getRequestId());
+        self::assertNull($this->entity->getRequestId());
     }
 
     /**
@@ -61,7 +61,7 @@ class ChatCompletionLogTest extends AbstractIntegrationTestCase
     {
         $model = 'gpt-4-turbo';
         $this->entity->setModel($model);
-        $this->assertSame($model, $this->entity->getModel());
+        self::assertSame($model, $this->entity->getModel());
     }
 
     /**
@@ -71,7 +71,7 @@ class ChatCompletionLogTest extends AbstractIntegrationTestCase
     {
         $status = 'failed';
         $this->entity->setStatus($status);
-        $this->assertSame($status, $this->entity->getStatus());
+        self::assertSame($status, $this->entity->getStatus());
     }
 
     /**
@@ -81,7 +81,7 @@ class ChatCompletionLogTest extends AbstractIntegrationTestCase
     {
         $payload = ['messages' => [['role' => 'user', 'content' => 'Hello']]];
         $this->entity->setRequestPayload($payload);
-        $this->assertSame($payload, $this->entity->getRequestPayload());
+        self::assertSame($payload, $this->entity->getRequestPayload());
     }
 
     /**
@@ -91,10 +91,10 @@ class ChatCompletionLogTest extends AbstractIntegrationTestCase
     {
         $payload = ['choices' => [['message' => ['role' => 'assistant', 'content' => 'Hi!']]]];
         $this->entity->setResponsePayload($payload);
-        $this->assertSame($payload, $this->entity->getResponsePayload());
+        self::assertSame($payload, $this->entity->getResponsePayload());
 
         $this->entity->setResponsePayload(null);
-        $this->assertNull($this->entity->getResponsePayload());
+        self::assertNull($this->entity->getResponsePayload());
     }
 
     /**
@@ -104,10 +104,10 @@ class ChatCompletionLogTest extends AbstractIntegrationTestCase
     {
         $errorMessage = 'API rate limit exceeded';
         $this->entity->setErrorMessage($errorMessage);
-        $this->assertSame($errorMessage, $this->entity->getErrorMessage());
+        self::assertSame($errorMessage, $this->entity->getErrorMessage());
 
         $this->entity->setErrorMessage(null);
-        $this->assertNull($this->entity->getErrorMessage());
+        self::assertNull($this->entity->getErrorMessage());
     }
 
     /**
@@ -116,13 +116,13 @@ class ChatCompletionLogTest extends AbstractIntegrationTestCase
     public function testTokens(): void
     {
         $this->entity->setPromptTokens(100);
-        $this->assertSame(100, $this->entity->getPromptTokens());
+        self::assertSame(100, $this->entity->getPromptTokens());
 
         $this->entity->setCompletionTokens(50);
-        $this->assertSame(50, $this->entity->getCompletionTokens());
+        self::assertSame(50, $this->entity->getCompletionTokens());
 
         $this->entity->setTotalTokens(150);
-        $this->assertSame(150, $this->entity->getTotalTokens());
+        self::assertSame(150, $this->entity->getTotalTokens());
     }
 
     /**
@@ -139,13 +139,13 @@ class ChatCompletionLogTest extends AbstractIntegrationTestCase
         $this->entity->setCompletionTokens(20);
         $this->entity->setTotalTokens(30);
 
-        $this->assertSame('req_test123', $this->entity->getRequestId());
-        $this->assertSame('gpt-4', $this->entity->getModel());
-        $this->assertSame('success', $this->entity->getStatus());
-        $this->assertSame(['test' => 'data'], $this->entity->getRequestPayload());
-        $this->assertSame(['response' => 'data'], $this->entity->getResponsePayload());
-        $this->assertSame(10, $this->entity->getPromptTokens());
-        $this->assertSame(20, $this->entity->getCompletionTokens());
-        $this->assertSame(30, $this->entity->getTotalTokens());
+        self::assertSame('req_test123', $this->entity->getRequestId());
+        self::assertSame('gpt-4', $this->entity->getModel());
+        self::assertSame('success', $this->entity->getStatus());
+        self::assertSame(['test' => 'data'], $this->entity->getRequestPayload());
+        self::assertSame(['response' => 'data'], $this->entity->getResponsePayload());
+        self::assertSame(10, $this->entity->getPromptTokens());
+        self::assertSame(20, $this->entity->getCompletionTokens());
+        self::assertSame(30, $this->entity->getTotalTokens());
     }
 }

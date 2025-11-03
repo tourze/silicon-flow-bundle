@@ -18,7 +18,7 @@ class TestControllerTest extends AbstractWebTestCase
     {
         // AbstractWebTestCase 要求实现的抽象方法
         // 这里可以测试不支持的 HTTP 方法
-        $this->markTestSkipped('此测试控制器不需要测试 405 Method Not Allowed');
+        self::markTestSkipped('此测试控制器不需要测试 405 Method Not Allowed');
     }
 
     /**
@@ -27,7 +27,7 @@ class TestControllerTest extends AbstractWebTestCase
     public function testControllerIsFinal(): void
     {
         $reflection = new \ReflectionClass(TestController::class);
-        $this->assertTrue($reflection->isFinal(), 'TestController should be final');
+        self::assertTrue($reflection->isFinal(), 'TestController should be final');
     }
 
     /**
@@ -46,7 +46,7 @@ class TestControllerTest extends AbstractWebTestCase
             }
         }
 
-        $this->assertTrue($routeFound, 'Controller should have Route attribute');
+        self::assertTrue($routeFound, 'Controller should have Route attribute');
     }
 
     /**
@@ -56,12 +56,12 @@ class TestControllerTest extends AbstractWebTestCase
     {
         $reflection = new \ReflectionClass(TestController::class);
 
-        $this->assertTrue($reflection->hasMethod('chatCompletion'));
-        $this->assertTrue($reflection->hasMethod('chatMessages'));
-        $this->assertTrue($reflection->hasMethod('imageGeneration'));
-        $this->assertTrue($reflection->hasMethod('submitVideo'));
-        $this->assertTrue($reflection->hasMethod('getVideoStatus'));
-        $this->assertTrue($reflection->hasMethod('getModels'));
+        self::assertTrue($reflection->hasMethod('chatCompletion'));
+        self::assertTrue($reflection->hasMethod('chatMessages'));
+        self::assertTrue($reflection->hasMethod('imageGeneration'));
+        self::assertTrue($reflection->hasMethod('submitVideo'));
+        self::assertTrue($reflection->hasMethod('getVideoStatus'));
+        self::assertTrue($reflection->hasMethod('getModels'));
     }
 
     /**
@@ -71,11 +71,11 @@ class TestControllerTest extends AbstractWebTestCase
     {
         $reflection = new \ReflectionClass(TestController::class);
 
-        $this->assertTrue($reflection->hasMethod('syncModels'));
-        $this->assertTrue($reflection->hasMethod('extractModelIds'));
-        $this->assertTrue($reflection->hasMethod('processModelItem'));
-        $this->assertTrue($reflection->hasMethod('requireActiveConfig'));
-        $this->assertTrue($reflection->hasMethod('requireDefaultUser'));
+        self::assertTrue($reflection->hasMethod('syncModels'));
+        self::assertTrue($reflection->hasMethod('extractModelIds'));
+        self::assertTrue($reflection->hasMethod('processModelItem'));
+        self::assertTrue($reflection->hasMethod('requireActiveConfig'));
+        self::assertTrue($reflection->hasMethod('requireDefaultUser'));
     }
 
     /**
@@ -86,8 +86,8 @@ class TestControllerTest extends AbstractWebTestCase
         $reflection = new \ReflectionClass(TestController::class);
         $constructor = $reflection->getConstructor();
 
-        $this->assertNotNull($constructor);
-        $this->assertCount(10, $constructor->getParameters());
+        self::assertNotNull($constructor);
+        self::assertCount(10, $constructor->getParameters());
 
         $parameterNames = array_map(
             static fn(\ReflectionParameter $param): string => $param->getName(),
@@ -107,7 +107,7 @@ class TestControllerTest extends AbstractWebTestCase
             'imageProcessingService',
         ];
 
-        $this->assertSame($expectedParams, $parameterNames);
+        self::assertSame($expectedParams, $parameterNames);
     }
 
     /**
@@ -138,7 +138,7 @@ class TestControllerTest extends AbstractWebTestCase
                 }
             }
 
-            $this->assertTrue($routeFound, sprintf('Method %s should have Route attribute', $methodName));
+            self::assertTrue($routeFound, sprintf('Method %s should have Route attribute', $methodName));
         }
     }
 
@@ -150,12 +150,12 @@ class TestControllerTest extends AbstractWebTestCase
         $reflection = new \ReflectionClass(TestController::class);
         $method = $reflection->getMethod('extractModelIds');
 
-        $this->assertTrue($method->isPrivate());
-        $this->assertCount(1, $method->getParameters());
+        self::assertTrue($method->isPrivate());
+        self::assertCount(1, $method->getParameters());
 
         $param = $method->getParameters()[0];
-        $this->assertSame('models', $param->getName());
-        $this->assertTrue($param->hasType());
+        self::assertSame('models', $param->getName());
+        self::assertTrue($param->hasType());
     }
 
     /**
@@ -178,13 +178,13 @@ class TestControllerTest extends AbstractWebTestCase
             $method = $reflection->getMethod($methodName);
             $returnType = $method->getReturnType();
 
-            $this->assertNotNull($returnType, sprintf('Method %s should have return type', $methodName));
+            self::assertNotNull($returnType, sprintf('Method %s should have return type', $methodName));
 
             $typeName = $returnType instanceof \ReflectionNamedType
                 ? $returnType->getName()
                 : (string) $returnType;
 
-            $this->assertSame('Symfony\Component\HttpFoundation\JsonResponse', $typeName);
+            self::assertSame('Symfony\Component\HttpFoundation\JsonResponse', $typeName);
         }
     }
 }

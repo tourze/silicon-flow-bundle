@@ -28,10 +28,10 @@ class SiliconFlowConfigTest extends AbstractIntegrationTestCase
      */
     public function testInstantiation(): void
     {
-        $this->assertInstanceOf(SiliconFlowConfig::class, $this->entity);
-        $this->assertTrue($this->entity->isActive()); // 默认启用
-        $this->assertSame(0, $this->entity->getPriority()); // 默认优先级为0
-        $this->assertSame('https://api.siliconflow.cn', $this->entity->getBaseUrl()); // 默认URL
+        self::assertInstanceOf(SiliconFlowConfig::class, $this->entity);
+        self::assertTrue($this->entity->isActive()); // 默认启用
+        self::assertSame(0, $this->entity->getPriority()); // 默认优先级为0
+        self::assertSame('https://api.siliconflow.cn', $this->entity->getBaseUrl()); // 默认URL
     }
 
     /**
@@ -40,7 +40,7 @@ class SiliconFlowConfigTest extends AbstractIntegrationTestCase
     public function testToString(): void
     {
         $this->entity->setName('测试配置');
-        $this->assertSame('测试配置', (string) $this->entity);
+        self::assertSame('测试配置', (string) $this->entity);
     }
 
     /**
@@ -50,7 +50,7 @@ class SiliconFlowConfigTest extends AbstractIntegrationTestCase
     {
         $name = '生产环境配置';
         $this->entity->setName($name);
-        $this->assertSame($name, $this->entity->getName());
+        self::assertSame($name, $this->entity->getName());
     }
 
     /**
@@ -60,11 +60,11 @@ class SiliconFlowConfigTest extends AbstractIntegrationTestCase
     {
         $baseUrl = 'https://custom.api.com';
         $this->entity->setBaseUrl($baseUrl);
-        $this->assertSame($baseUrl, $this->entity->getBaseUrl());
+        self::assertSame($baseUrl, $this->entity->getBaseUrl());
 
         // 测试自动去除末尾斜杠
         $this->entity->setBaseUrl('https://api.test.com/');
-        $this->assertSame('https://api.test.com', $this->entity->getBaseUrl());
+        self::assertSame('https://api.test.com', $this->entity->getBaseUrl());
     }
 
     /**
@@ -74,7 +74,7 @@ class SiliconFlowConfigTest extends AbstractIntegrationTestCase
     {
         $token = 'sk-abc123def456';
         $this->entity->setApiToken($token);
-        $this->assertSame($token, $this->entity->getApiToken());
+        self::assertSame($token, $this->entity->getApiToken());
     }
 
     /**
@@ -82,13 +82,13 @@ class SiliconFlowConfigTest extends AbstractIntegrationTestCase
      */
     public function testIsActive(): void
     {
-        $this->assertTrue($this->entity->isActive()); // 默认值
+        self::assertTrue($this->entity->isActive()); // 默认值
 
         $this->entity->setIsActive(false);
-        $this->assertFalse($this->entity->isActive());
+        self::assertFalse($this->entity->isActive());
 
         $this->entity->setIsActive(true);
-        $this->assertTrue($this->entity->isActive());
+        self::assertTrue($this->entity->isActive());
     }
 
     /**
@@ -98,7 +98,7 @@ class SiliconFlowConfigTest extends AbstractIntegrationTestCase
     {
         $priority = 100;
         $this->entity->setPriority($priority);
-        $this->assertSame($priority, $this->entity->getPriority());
+        self::assertSame($priority, $this->entity->getPriority());
     }
 
     /**
@@ -108,10 +108,10 @@ class SiliconFlowConfigTest extends AbstractIntegrationTestCase
     {
         $description = '这是一个测试配置';
         $this->entity->setDescription($description);
-        $this->assertSame($description, $this->entity->getDescription());
+        self::assertSame($description, $this->entity->getDescription());
 
         $this->entity->setDescription(null);
-        $this->assertNull($this->entity->getDescription());
+        self::assertNull($this->entity->getDescription());
     }
 
     /**
@@ -120,10 +120,10 @@ class SiliconFlowConfigTest extends AbstractIntegrationTestCase
     public function testActivate(): void
     {
         $this->entity->setIsActive(false);
-        $this->assertFalse($this->entity->isActive());
+        self::assertFalse($this->entity->isActive());
 
         $this->entity->activate();
-        $this->assertTrue($this->entity->isActive());
+        self::assertTrue($this->entity->isActive());
     }
 
     /**
@@ -132,10 +132,10 @@ class SiliconFlowConfigTest extends AbstractIntegrationTestCase
     public function testDeactivate(): void
     {
         $this->entity->setIsActive(true);
-        $this->assertTrue($this->entity->isActive());
+        self::assertTrue($this->entity->isActive());
 
         $this->entity->deactivate();
-        $this->assertFalse($this->entity->isActive());
+        self::assertFalse($this->entity->isActive());
     }
 
     /**
@@ -150,11 +150,11 @@ class SiliconFlowConfigTest extends AbstractIntegrationTestCase
         $this->entity->setPriority(50);
         $this->entity->setDescription('测试用配置');
 
-        $this->assertSame('测试配置', $this->entity->getName());
-        $this->assertSame('https://test.api.com', $this->entity->getBaseUrl());
-        $this->assertSame('test-token-123', $this->entity->getApiToken());
-        $this->assertFalse($this->entity->isActive());
-        $this->assertSame(50, $this->entity->getPriority());
-        $this->assertSame('测试用配置', $this->entity->getDescription());
+        self::assertSame('测试配置', $this->entity->getName());
+        self::assertSame('https://test.api.com', $this->entity->getBaseUrl());
+        self::assertSame('test-token-123', $this->entity->getApiToken());
+        self::assertFalse($this->entity->isActive());
+        self::assertSame(50, $this->entity->getPriority());
+        self::assertSame('测试用配置', $this->entity->getDescription());
     }
 }

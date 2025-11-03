@@ -195,6 +195,6 @@ final class CreateChatMessagesRequestTest extends RequestTestCase
 
         $request = new CreateChatMessagesRequest($config, 'deepseek-chat', $messages, 1024, ['stream' => true]);
 
-        $this->assertTrue($request->expectsStream());
+        self::assertTrue($request->expectsStream());
     }
 }

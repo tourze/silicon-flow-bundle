@@ -34,7 +34,7 @@ class SubmitVideoRequestTest extends RequestTestCase
             'image_size' => '1280x720',
         ];
         $request = new SubmitVideoRequest($this->config, $payload);
-        $this->assertInstanceOf(SubmitVideoRequest::class, $request);
+        self::assertInstanceOf(SubmitVideoRequest::class, $request);
     }
 
     public function testGetMethod(): void
@@ -45,7 +45,7 @@ class SubmitVideoRequestTest extends RequestTestCase
             'image_size' => '1280x720',
         ];
         $request = new SubmitVideoRequest($this->config, $payload);
-        $this->assertSame('POST', $request->getRequestMethod());
+        self::assertSame('POST', $request->getRequestMethod());
     }
 
     public function testGetPath(): void
@@ -56,7 +56,7 @@ class SubmitVideoRequestTest extends RequestTestCase
             'image_size' => '1280x720',
         ];
         $request = new SubmitVideoRequest($this->config, $payload);
-        $this->assertSame('/v1/video/submit', $request->getRequestPath());
+        self::assertSame('/v1/video/submit', $request->getRequestPath());
     }
 
     public function testGetHeaders(): void
@@ -69,15 +69,15 @@ class SubmitVideoRequestTest extends RequestTestCase
         $request = new SubmitVideoRequest($this->config, $payload);
         $options = $request->getRequestOptions();
 
-        $this->assertIsArray($options);
-        $this->assertArrayHasKey('headers', $options);
+        self::assertIsArray($options);
+        self::assertArrayHasKey('headers', $options);
 
         $headers = $options['headers'];
-        $this->assertIsArray($headers);
-        $this->assertArrayHasKey('Content-Type', $headers);
-        $this->assertSame('application/json', $headers['Content-Type']);
-        $this->assertArrayHasKey('Authorization', $headers);
-        $this->assertSame('Bearer test-token', $headers['Authorization']);
+        self::assertIsArray($headers);
+        self::assertArrayHasKey('Content-Type', $headers);
+        self::assertSame('application/json', $headers['Content-Type']);
+        self::assertArrayHasKey('Authorization', $headers);
+        self::assertSame('Bearer test-token', $headers['Authorization']);
     }
 
     public function testGetBody(): void
@@ -90,13 +90,13 @@ class SubmitVideoRequestTest extends RequestTestCase
         $request = new SubmitVideoRequest($this->config, $payload);
         $options = $request->getRequestOptions();
 
-        $this->assertArrayHasKey('json', $options);
+        self::assertArrayHasKey('json', $options);
         $decoded = $options['json'];
-        $this->assertIsArray($decoded);
-        $this->assertArrayHasKey('model', $decoded);
-        $this->assertArrayHasKey('prompt', $decoded);
-        $this->assertSame('cogvideox-flash', $decoded['model']);
-        $this->assertSame('A flying bird in the sky', $decoded['prompt']);
+        self::assertIsArray($decoded);
+        self::assertArrayHasKey('model', $decoded);
+        self::assertArrayHasKey('prompt', $decoded);
+        self::assertSame('cogvideox-flash', $decoded['model']);
+        self::assertSame('A flying bird in the sky', $decoded['prompt']);
     }
 
     public function testGetBodyWithOptionalParams(): void
@@ -111,16 +111,16 @@ class SubmitVideoRequestTest extends RequestTestCase
         $request = new SubmitVideoRequest($this->config, $payload);
         $options = $request->getRequestOptions();
 
-        $this->assertArrayHasKey('json', $options);
+        self::assertArrayHasKey('json', $options);
         $decoded = $options['json'];
-        $this->assertIsArray($decoded);
+        self::assertIsArray($decoded);
 
-        $this->assertArrayHasKey('negative_prompt', $decoded);
-        $this->assertArrayHasKey('image_size', $decoded);
-        $this->assertArrayHasKey('num_inference_steps', $decoded);
-        $this->assertSame('blurry, low quality', $decoded['negative_prompt']);
-        $this->assertSame('768x768', $decoded['image_size']);
-        $this->assertSame(20, $decoded['num_inference_steps']);
+        self::assertArrayHasKey('negative_prompt', $decoded);
+        self::assertArrayHasKey('image_size', $decoded);
+        self::assertArrayHasKey('num_inference_steps', $decoded);
+        self::assertSame('blurry, low quality', $decoded['negative_prompt']);
+        self::assertSame('768x768', $decoded['image_size']);
+        self::assertSame(20, $decoded['num_inference_steps']);
     }
 
     public function testGetBodyWithImage(): void
@@ -136,12 +136,12 @@ class SubmitVideoRequestTest extends RequestTestCase
         $request = new SubmitVideoRequest($this->config, $payload);
         $options = $request->getRequestOptions();
 
-        $this->assertArrayHasKey('json', $options);
+        self::assertArrayHasKey('json', $options);
         $decoded = $options['json'];
-        $this->assertIsArray($decoded);
+        self::assertIsArray($decoded);
 
-        $this->assertArrayHasKey('image', $decoded);
-        $this->assertSame($imageBase64, $decoded['image']);
+        self::assertArrayHasKey('image', $decoded);
+        self::assertSame($imageBase64, $decoded['image']);
     }
 
     public function testValidate(): void
@@ -155,7 +155,7 @@ class SubmitVideoRequestTest extends RequestTestCase
 
         // Should not throw when all required fields are present
         $request->validate();
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     public function testValidateWithoutModel(): void
@@ -227,9 +227,9 @@ class SubmitVideoRequestTest extends RequestTestCase
 
         $result = $request->parseResponse($responseContent);
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('requestId', $result);
-        $this->assertSame('req-123456', $result['requestId']);
+        self::assertIsArray($result);
+        self::assertArrayHasKey('requestId', $result);
+        self::assertSame('req-123456', $result['requestId']);
     }
 
     public function testParseResponseWithMissingRequestId(): void

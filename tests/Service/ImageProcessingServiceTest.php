@@ -20,12 +20,12 @@ class ImageProcessingServiceTest extends AbstractIntegrationTestCase
 
     protected function onSetUp(): void
     {
-        $this->service = $this->getService(ImageProcessingService::class);
+        $this->service = self::getService(ImageProcessingService::class);
     }
 
     public function testInstantiation(): void
     {
-        $this->assertInstanceOf(ImageProcessingService::class, $this->service);
+        self::assertInstanceOf(ImageProcessingService::class, $this->service);
     }
 
     public function testTransformUrlArray(): void
@@ -38,22 +38,22 @@ class ImageProcessingServiceTest extends AbstractIntegrationTestCase
 
         $result = $this->service->transformUrlArray($input);
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey(0, $result);
-        $this->assertArrayHasKey(1, $result);
-        $this->assertArrayHasKey(2, $result);
+        self::assertIsArray($result);
+        self::assertArrayHasKey(0, $result);
+        self::assertArrayHasKey(1, $result);
+        self::assertArrayHasKey(2, $result);
 
         // 验证返回的是顺序数组 array<int, array<string, mixed>|string>
         foreach ($result as $index => $item) {
-            $this->assertIsInt($index);
-            $this->assertTrue(is_string($item) || is_array($item));
+            self::assertIsInt($index);
+            self::assertTrue(is_string($item) || is_array($item));
         }
     }
 
     public function testTransformUrlArrayEmpty(): void
     {
         $result = $this->service->transformUrlArray([]);
-        $this->assertSame([], $result);
+        self::assertSame([], $result);
     }
 
     public function testProcessImageUrls(): void
@@ -64,7 +64,7 @@ class ImageProcessingServiceTest extends AbstractIntegrationTestCase
         ];
 
         $result = $this->service->processImageUrls($urls);
-        $this->assertIsArray($result);
-        $this->assertCount(2, $result);
+        self::assertIsArray($result);
+        self::assertCount(2, $result);
     }
 }

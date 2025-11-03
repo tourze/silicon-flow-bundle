@@ -17,18 +17,18 @@ class SiliconFlowImageGenerationRepositoryTest extends AbstractIntegrationTestCa
 
     protected function onSetUp(): void
     {
-        $this->repository = $this->getService(SiliconFlowImageGenerationRepository::class);
+        $this->repository = self::getService(SiliconFlowImageGenerationRepository::class);
     }
 
     public function testInstantiation(): void
     {
-        $this->assertInstanceOf(SiliconFlowImageGenerationRepository::class, $this->repository);
+        self::assertInstanceOf(SiliconFlowImageGenerationRepository::class, $this->repository);
     }
 
     public function testCount(): void
     {
         $count = $this->repository->count([]);
-        $this->assertIsInt($count);
-        $this->assertGreaterThanOrEqual(0, $count);
+        self::assertIsInt($count);
+        self::assertGreaterThanOrEqual(0, $count);
     }
 }

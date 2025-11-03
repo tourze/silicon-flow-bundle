@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tourze\SiliconFlowBundle\Tests\Controller\Admin;
 
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\PHPUnitSymfonyWebTest\AbstractEasyAdminControllerTestCase;
 use Tourze\SiliconFlowBundle\Controller\Admin\SiliconFlowConversationCrudController;
 use Tourze\SiliconFlowBundle\Entity\SiliconFlowConversation;
@@ -13,6 +14,7 @@ use Tourze\SiliconFlowBundle\Entity\SiliconFlowConversation;
  * SiliconFlow 对话 CRUD 控制器测试
  */
 #[CoversClass(SiliconFlowConversationCrudController::class)]
+#[RunTestsInSeparateProcesses]
 class SiliconFlowConversationCrudControllerTest extends AbstractEasyAdminControllerTestCase
 {
     /** @return iterable<string, array{string}> */
@@ -38,11 +40,34 @@ class SiliconFlowConversationCrudControllerTest extends AbstractEasyAdminControl
     }
 
     /**
+     * @return iterable<string, array{string}>
+     */
+    public static function provideNewPageFields(): iterable
+    {
+        return [
+            '对话类型' => ['对话类型'],
+            '使用模型' => ['使用模型'],
+        ];
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function provideEditPageFields(): iterable
+    {
+        return [
+            '对话类型' => ['对话类型'],
+            '使用模型' => ['使用模型'],
+            '问题内容' => ['问题内容'],
+        ];
+    }
+
+    /**
      * 测试获取实体类名
      */
     public function testGetEntityFqcn(): void
     {
         $fqcn = SiliconFlowConversationCrudController::getEntityFqcn();
-        $this->assertSame(SiliconFlowConversation::class, $fqcn);
+        self::assertSame(SiliconFlowConversation::class, $fqcn);
     }
 }

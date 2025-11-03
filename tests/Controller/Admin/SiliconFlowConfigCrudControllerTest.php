@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tourze\SiliconFlowBundle\Tests\Controller\Admin;
 
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\PHPUnitSymfonyWebTest\AbstractEasyAdminControllerTestCase;
 use Tourze\SiliconFlowBundle\Controller\Admin\SiliconFlowConfigCrudController;
 use Tourze\SiliconFlowBundle\Entity\SiliconFlowConfig;
@@ -13,6 +14,7 @@ use Tourze\SiliconFlowBundle\Entity\SiliconFlowConfig;
  * SiliconFlow 配置 CRUD 控制器测试
  */
 #[CoversClass(SiliconFlowConfigCrudController::class)]
+#[RunTestsInSeparateProcesses]
 class SiliconFlowConfigCrudControllerTest extends AbstractEasyAdminControllerTestCase
 {
     /** @return iterable<string, array{string}> */
@@ -38,11 +40,34 @@ class SiliconFlowConfigCrudControllerTest extends AbstractEasyAdminControllerTes
     }
 
     /**
+     * @return iterable<string, array{string}>
+     */
+    public static function provideNewPageFields(): iterable
+    {
+        return [
+            '配置名称' => ['配置名称'],
+            'API Key' => ['API Key'],
+        ];
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function provideEditPageFields(): iterable
+    {
+        return [
+            '配置名称' => ['配置名称'],
+            'API Key' => ['API Key'],
+            '是否启用' => ['是否启用'],
+        ];
+    }
+
+    /**
      * 测试获取实体类名
      */
     public function testGetEntityFqcn(): void
     {
         $fqcn = SiliconFlowConfigCrudController::getEntityFqcn();
-        $this->assertSame(SiliconFlowConfig::class, $fqcn);
+        self::assertSame(SiliconFlowConfig::class, $fqcn);
     }
 }
