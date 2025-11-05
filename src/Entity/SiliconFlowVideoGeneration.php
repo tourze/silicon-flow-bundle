@@ -39,12 +39,10 @@ class SiliconFlowVideoGeneration implements \Stringable
 
     #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '反向提示词'])]
     #[Assert\Type(type: 'string')]
-    #[Assert\Length(max: 65535)]
     private ?string $negativePrompt = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '输入图像 Base64 或 URL'])]
     #[Assert\Type(type: 'string')]
-    #[Assert\Length(max: 65535)]
     private ?string $image = null;
 
     #[ORM\Column(type: Types::STRING, length: 30, nullable: true, options: ['comment' => '图像尺寸(widthxheight)'])]
@@ -55,7 +53,7 @@ class SiliconFlowVideoGeneration implements \Stringable
     #[Assert\PositiveOrZero]
     private ?int $seed = null;
 
-    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['default' => 5, 'comment' => '采样步数'])]
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['default' => 5, ' comment' => '采样步数'])]
     #[Assert\Type(type: 'int')]
     #[Assert\Positive]
     private ?int $numInferenceSteps = 5;
