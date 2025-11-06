@@ -53,7 +53,7 @@ class SiliconFlowVideoGeneration implements \Stringable
     #[Assert\PositiveOrZero]
     private ?int $seed = null;
 
-    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['default' => 5, ' comment' => '采样步数'])]
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['default' => 5, 'comment' => '推理步数'])]
     #[Assert\Type(type: 'int')]
     #[Assert\Positive]
     private ?int $numInferenceSteps = 5;

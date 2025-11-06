@@ -6,34 +6,40 @@ namespace Tourze\SiliconFlowBundle\Tests\Entity;
 
 use BizUserBundle\Entity\BizUser;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Tourze\PHPUnitSymfonyKernelTest\AbstractIntegrationTestCase;
+use Tourze\PHPUnitDoctrineEntity\AbstractEntityTestCase;
 use Tourze\SiliconFlowBundle\Entity\SiliconFlowImageGeneration;
 
 /**
  * SiliconFlow 图片生成实体测试
  */
 #[CoversClass(SiliconFlowImageGeneration::class)]
-#[RunTestsInSeparateProcesses]
-class SiliconFlowImageGenerationTest extends AbstractIntegrationTestCase
+class SiliconFlowImageGenerationTest extends AbstractEntityTestCase
 {
-    private SiliconFlowImageGeneration $entity;
-    private BizUser $mockUser;
-
-    protected function onSetUp(): void
+    protected function createEntity(): object
     {
-        $this->entity = new SiliconFlowImageGeneration();
-        $this->mockUser = $this->createMock(BizUser::class);
+        return new SiliconFlowImageGeneration();
     }
 
     /**
-     * 测试实体实例化
+     * @return iterable<array{string, mixed}>
      */
-    public function testInstantiation(): void
+    public static function propertiesProvider(): iterable
     {
-        self::assertInstanceOf(SiliconFlowImageGeneration::class, $this->entity);
-        self::assertNull($this->entity->getId());
-        self::assertSame(1, $this->entity->getBatchSize()); // 默认批量数量为1
+        return [
+            'model' => ['model', 'stable-diffusion-xl'],
+            'prompt' => ['prompt', 'A beautiful landscape'],
+            'negativePrompt' => ['negativePrompt', 'blurry'],
+            'imageSize' => ['imageSize', '1024x1024'],
+            'batchSize' => ['batchSize', 2],
+            'seed' => ['seed', 123456],
+            'numInferenceSteps' => ['numInferenceSteps', 50],
+            'requestPayload' => ['requestPayload', ['test' => 'data']],
+            'responsePayload' => ['responsePayload', ['response' => 'data']],
+            'imageUrls' => ['imageUrls', 'https://example.com/image.jpg'],
+            'inferenceTime' => ['inferenceTime', 10.5],
+            'responseSeed' => ['responseSeed', 654321],
+            'status' => ['status', 'success'],
+        ];
     }
 
     /**
@@ -41,17 +47,18 @@ class SiliconFlowImageGenerationTest extends AbstractIntegrationTestCase
      */
     public function testToString(): void
     {
-        $this->entity->setModel('stable-diffusion');
-        $this->entity->setPrompt('A beautiful sunset over the mountains');
+        $entity = $this->createEntity();
+        $entity->setModel('stable-diffusion');
+        $entity->setPrompt('A beautiful sunset over the mountains');
 
-        $result = (string) $this->entity;
+        $result = (string) $entity;
         self::assertStringStartsWith('stable-diffusion: ', $result);
         self::assertStringContainsString('A beautiful sunset over the mountains', $result);
 
         // 测试长提示词截断
         $longPrompt = str_repeat('very long prompt text ', 10);
-        $this->entity->setPrompt($longPrompt);
-        $result = (string) $this->entity;
+        $entity->setPrompt($longPrompt);
+        $result = (string) $entity;
         self::assertStringEndsWith('...', $result);
     }
 
@@ -60,9 +67,10 @@ class SiliconFlowImageGenerationTest extends AbstractIntegrationTestCase
      */
     public function testModel(): void
     {
+        $entity = $this->createEntity();
         $model = 'stable-diffusion-xl';
-        $this->entity->setModel($model);
-        self::assertSame($model, $this->entity->getModel());
+        $entity->setModel($model);
+        self::assertSame($model, $entity->getModel());
     }
 
     /**
@@ -70,9 +78,10 @@ class SiliconFlowImageGenerationTest extends AbstractIntegrationTestCase
      */
     public function testPrompt(): void
     {
+        $entity = $this->createEntity();
         $prompt = 'A cat sitting on a chair';
-        $this->entity->setPrompt($prompt);
-        self::assertSame($prompt, $this->entity->getPrompt());
+        $entity->setPrompt($prompt);
+        self::assertSame($prompt, $entity->getPrompt());
     }
 
     /**
@@ -80,12 +89,13 @@ class SiliconFlowImageGenerationTest extends AbstractIntegrationTestCase
      */
     public function testNegativePrompt(): void
     {
+        $entity = $this->createEntity();
         $negativePrompt = 'blurry, low quality';
-        $this->entity->setNegativePrompt($negativePrompt);
-        self::assertSame($negativePrompt, $this->entity->getNegativePrompt());
+        $entity->setNegativePrompt($negativePrompt);
+        self::assertSame($negativePrompt, $entity->getNegativePrompt());
 
-        $this->entity->setNegativePrompt(null);
-        self::assertNull($this->entity->getNegativePrompt());
+        $entity->setNegativePrompt(null);
+        self::assertNull($entity->getNegativePrompt());
     }
 
     /**
@@ -93,12 +103,13 @@ class SiliconFlowImageGenerationTest extends AbstractIntegrationTestCase
      */
     public function testImageSize(): void
     {
+        $entity = $this->createEntity();
         $size = '512x512';
-        $this->entity->setImageSize($size);
-        self::assertSame($size, $this->entity->getImageSize());
+        $entity->setImageSize($size);
+        self::assertSame($size, $entity->getImageSize());
 
-        $this->entity->setImageSize(null);
-        self::assertNull($this->entity->getImageSize());
+        $entity->setImageSize(null);
+        self::assertNull($entity->getImageSize());
     }
 
     /**
@@ -106,9 +117,10 @@ class SiliconFlowImageGenerationTest extends AbstractIntegrationTestCase
      */
     public function testBatchSize(): void
     {
+        $entity = $this->createEntity();
         $batchSize = 4;
-        $this->entity->setBatchSize($batchSize);
-        self::assertSame($batchSize, $this->entity->getBatchSize());
+        $entity->setBatchSize($batchSize);
+        self::assertSame($batchSize, $entity->getBatchSize());
     }
 
     /**
@@ -116,12 +128,13 @@ class SiliconFlowImageGenerationTest extends AbstractIntegrationTestCase
      */
     public function testSeed(): void
     {
+        $entity = $this->createEntity();
         $seed = 123456789;
-        $this->entity->setSeed($seed);
-        self::assertSame($seed, $this->entity->getSeed());
+        $entity->setSeed($seed);
+        self::assertSame($seed, $entity->getSeed());
 
-        $this->entity->setSeed(null);
-        self::assertNull($this->entity->getSeed());
+        $entity->setSeed(null);
+        self::assertNull($entity->getSeed());
     }
 
     /**
@@ -129,12 +142,13 @@ class SiliconFlowImageGenerationTest extends AbstractIntegrationTestCase
      */
     public function testNumInferenceSteps(): void
     {
+        $entity = $this->createEntity();
         $steps = 50;
-        $this->entity->setNumInferenceSteps($steps);
-        self::assertSame($steps, $this->entity->getNumInferenceSteps());
+        $entity->setNumInferenceSteps($steps);
+        self::assertSame($steps, $entity->getNumInferenceSteps());
 
-        $this->entity->setNumInferenceSteps(null);
-        self::assertNull($this->entity->getNumInferenceSteps());
+        $entity->setNumInferenceSteps(null);
+        self::assertNull($entity->getNumInferenceSteps());
     }
 
     /**
@@ -142,9 +156,10 @@ class SiliconFlowImageGenerationTest extends AbstractIntegrationTestCase
      */
     public function testRequestPayload(): void
     {
+        $entity = $this->createEntity();
         $payload = ['prompt' => 'test', 'model' => 'test-model'];
-        $this->entity->setRequestPayload($payload);
-        self::assertSame($payload, $this->entity->getRequestPayload());
+        $entity->setRequestPayload($payload);
+        self::assertSame($payload, $entity->getRequestPayload());
     }
 
     /**
@@ -152,12 +167,13 @@ class SiliconFlowImageGenerationTest extends AbstractIntegrationTestCase
      */
     public function testResponsePayload(): void
     {
+        $entity = $this->createEntity();
         $payload = ['images' => ['url1', 'url2']];
-        $this->entity->setResponsePayload($payload);
-        self::assertSame($payload, $this->entity->getResponsePayload());
+        $entity->setResponsePayload($payload);
+        self::assertSame($payload, $entity->getResponsePayload());
 
-        $this->entity->setResponsePayload(null);
-        self::assertNull($this->entity->getResponsePayload());
+        $entity->setResponsePayload(null);
+        self::assertNull($entity->getResponsePayload());
     }
 
     /**
@@ -165,12 +181,13 @@ class SiliconFlowImageGenerationTest extends AbstractIntegrationTestCase
      */
     public function testImageUrls(): void
     {
+        $entity = $this->createEntity();
         $urls = 'https://example.com/image1.jpg,https://example.com/image2.jpg';
-        $this->entity->setImageUrls($urls);
-        self::assertSame($urls, $this->entity->getImageUrls());
+        $entity->setImageUrls($urls);
+        self::assertSame($urls, $entity->getImageUrls());
 
-        $this->entity->setImageUrls(null);
-        self::assertNull($this->entity->getImageUrls());
+        $entity->setImageUrls(null);
+        self::assertNull($entity->getImageUrls());
     }
 
     /**
@@ -178,12 +195,13 @@ class SiliconFlowImageGenerationTest extends AbstractIntegrationTestCase
      */
     public function testInferenceTime(): void
     {
+        $entity = $this->createEntity();
         $time = 5.5;
-        $this->entity->setInferenceTime($time);
-        self::assertSame($time, $this->entity->getInferenceTime());
+        $entity->setInferenceTime($time);
+        self::assertSame($time, $entity->getInferenceTime());
 
-        $this->entity->setInferenceTime(null);
-        self::assertNull($this->entity->getInferenceTime());
+        $entity->setInferenceTime(null);
+        self::assertNull($entity->getInferenceTime());
     }
 
     /**
@@ -191,12 +209,13 @@ class SiliconFlowImageGenerationTest extends AbstractIntegrationTestCase
      */
     public function testResponseSeed(): void
     {
+        $entity = $this->createEntity();
         $seed = 987654321;
-        $this->entity->setResponseSeed($seed);
-        self::assertSame($seed, $this->entity->getResponseSeed());
+        $entity->setResponseSeed($seed);
+        self::assertSame($seed, $entity->getResponseSeed());
 
-        $this->entity->setResponseSeed(null);
-        self::assertNull($this->entity->getResponseSeed());
+        $entity->setResponseSeed(null);
+        self::assertNull($entity->getResponseSeed());
     }
 
     /**
@@ -204,8 +223,10 @@ class SiliconFlowImageGenerationTest extends AbstractIntegrationTestCase
      */
     public function testSender(): void
     {
-        $this->entity->setSender($this->mockUser);
-        self::assertSame($this->mockUser, $this->entity->getSender());
+        $entity = $this->createEntity();
+        $mockUser = $this->createMock(BizUser::class);
+        $entity->setSender($mockUser);
+        self::assertSame($mockUser, $entity->getSender());
     }
 
     /**
@@ -213,12 +234,13 @@ class SiliconFlowImageGenerationTest extends AbstractIntegrationTestCase
      */
     public function testStatus(): void
     {
+        $entity = $this->createEntity();
         $status = 'completed';
-        $this->entity->setStatus($status);
-        self::assertSame($status, $this->entity->getStatus());
+        $entity->setStatus($status);
+        self::assertSame($status, $entity->getStatus());
 
-        $this->entity->setStatus(null);
-        self::assertNull($this->entity->getStatus());
+        $entity->setStatus(null);
+        self::assertNull($entity->getStatus());
     }
 
     /**
@@ -226,34 +248,37 @@ class SiliconFlowImageGenerationTest extends AbstractIntegrationTestCase
      */
     public function testCompleteEntity(): void
     {
-        $this->entity->setModel('stable-diffusion-xl');
-        $this->entity->setPrompt('A beautiful landscape');
-        $this->entity->setNegativePrompt('blurry');
-        $this->entity->setImageSize('1024x1024');
-        $this->entity->setBatchSize(2);
-        $this->entity->setSeed(123456);
-        $this->entity->setNumInferenceSteps(50);
-        $this->entity->setRequestPayload(['test' => 'data']);
-        $this->entity->setResponsePayload(['response' => 'data']);
-        $this->entity->setImageUrls('https://example.com/image.jpg');
-        $this->entity->setInferenceTime(10.5);
-        $this->entity->setResponseSeed(654321);
-        $this->entity->setSender($this->mockUser);
-        $this->entity->setStatus('success');
+        $entity = $this->createEntity();
+        $mockUser = $this->createMock(BizUser::class);
 
-        self::assertSame('stable-diffusion-xl', $this->entity->getModel());
-        self::assertSame('A beautiful landscape', $this->entity->getPrompt());
-        self::assertSame('blurry', $this->entity->getNegativePrompt());
-        self::assertSame('1024x1024', $this->entity->getImageSize());
-        self::assertSame(2, $this->entity->getBatchSize());
-        self::assertSame(123456, $this->entity->getSeed());
-        self::assertSame(50, $this->entity->getNumInferenceSteps());
-        self::assertSame(['test' => 'data'], $this->entity->getRequestPayload());
-        self::assertSame(['response' => 'data'], $this->entity->getResponsePayload());
-        self::assertSame('https://example.com/image.jpg', $this->entity->getImageUrls());
-        self::assertSame(10.5, $this->entity->getInferenceTime());
-        self::assertSame(654321, $this->entity->getResponseSeed());
-        self::assertSame($this->mockUser, $this->entity->getSender());
-        self::assertSame('success', $this->entity->getStatus());
+        $entity->setModel('stable-diffusion-xl');
+        $entity->setPrompt('A beautiful landscape');
+        $entity->setNegativePrompt('blurry');
+        $entity->setImageSize('1024x1024');
+        $entity->setBatchSize(2);
+        $entity->setSeed(123456);
+        $entity->setNumInferenceSteps(50);
+        $entity->setRequestPayload(['test' => 'data']);
+        $entity->setResponsePayload(['response' => 'data']);
+        $entity->setImageUrls('https://example.com/image.jpg');
+        $entity->setInferenceTime(10.5);
+        $entity->setResponseSeed(654321);
+        $entity->setSender($mockUser);
+        $entity->setStatus('success');
+
+        self::assertSame('stable-diffusion-xl', $entity->getModel());
+        self::assertSame('A beautiful landscape', $entity->getPrompt());
+        self::assertSame('blurry', $entity->getNegativePrompt());
+        self::assertSame('1024x1024', $entity->getImageSize());
+        self::assertSame(2, $entity->getBatchSize());
+        self::assertSame(123456, $entity->getSeed());
+        self::assertSame(50, $entity->getNumInferenceSteps());
+        self::assertSame(['test' => 'data'], $entity->getRequestPayload());
+        self::assertSame(['response' => 'data'], $entity->getResponsePayload());
+        self::assertSame('https://example.com/image.jpg', $entity->getImageUrls());
+        self::assertSame(10.5, $entity->getInferenceTime());
+        self::assertSame(654321, $entity->getResponseSeed());
+        self::assertSame($mockUser, $entity->getSender());
+        self::assertSame('success', $entity->getStatus());
     }
 }

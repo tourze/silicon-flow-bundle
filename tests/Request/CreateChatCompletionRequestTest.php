@@ -5,20 +5,21 @@ declare(strict_types=1);
 namespace Tourze\SiliconFlowBundle\Tests\Request;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
 use Tourze\SiliconFlowBundle\Entity\SiliconFlowConfig;
 use Tourze\SiliconFlowBundle\Request\CreateChatCompletionRequest;
+use HttpClientBundle\Test\RequestTestCase;
 
 /**
  * ChatCompletion 请求测试
  */
 #[CoversClass(CreateChatCompletionRequest::class)]
-class CreateChatCompletionRequestTest extends TestCase
+class CreateChatCompletionRequestTest extends RequestTestCase
 {
     private SiliconFlowConfig $config;
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->config = new SiliconFlowConfig();
         $this->config->setName('test');
         $this->config->setBaseUrl('https://api.siliconflow.cn');

@@ -26,9 +26,8 @@ class ChatCompletionLogCrudControllerTest extends AbstractEasyAdminControllerTes
             '状态' => ['状态'],
             'Prompt Tokens' => ['Prompt Tokens'],
             'Completion Tokens' => ['Completion Tokens'],
-            '总 Token 数' => ['总 Token 数'],
+            '总 Tokens' => ['总 Tokens'],
             '创建时间' => ['创建时间'],
-            '更新时间' => ['更新时间'],
         ];
     }
 

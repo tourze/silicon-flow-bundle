@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tourze\SiliconFlowBundle\Tests\Controller;
 
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\PHPUnitSymfonyWebTest\AbstractWebTestCase;
 use Tourze\SiliconFlowBundle\Controller\TestController;
 
@@ -12,12 +14,13 @@ use Tourze\SiliconFlowBundle\Controller\TestController;
  * SiliconFlow 测试控制器测试
  */
 #[CoversClass(TestController::class)]
+#[RunTestsInSeparateProcesses]
 class TestControllerTest extends AbstractWebTestCase
 {
+    #[DataProvider('provideNotAllowedMethods')]
     public function testMethodNotAllowed(string $method): void
     {
-        // AbstractWebTestCase 要求实现的抽象方法
-        // 这里可以测试不支持的 HTTP 方法
+        // 这个测试控制器不需要测试 405 Method Not Allowed
         self::markTestSkipped('此测试控制器不需要测试 405 Method Not Allowed');
     }
 

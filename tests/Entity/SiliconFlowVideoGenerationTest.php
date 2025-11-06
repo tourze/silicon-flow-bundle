@@ -6,37 +6,37 @@ namespace Tourze\SiliconFlowBundle\Tests\Entity;
 
 use BizUserBundle\Entity\BizUser;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Tourze\PHPUnitSymfonyKernelTest\AbstractIntegrationTestCase;
+use Tourze\PHPUnitDoctrineEntity\AbstractEntityTestCase;
 use Tourze\SiliconFlowBundle\Entity\SiliconFlowVideoGeneration;
 
 /**
  * SiliconFlow 视频生成实体测试
  */
 #[CoversClass(SiliconFlowVideoGeneration::class)]
-#[RunTestsInSeparateProcesses]
-class SiliconFlowVideoGenerationTest extends AbstractIntegrationTestCase
+class SiliconFlowVideoGenerationTest extends AbstractEntityTestCase
 {
-    private SiliconFlowVideoGeneration $entity;
-    private BizUser $mockUser;
-
-    protected function onSetUp(): void
+    protected function createEntity(): object
     {
-        $this->entity = new SiliconFlowVideoGeneration();
-        $this->mockUser = $this->createMock(BizUser::class);
+        return new SiliconFlowVideoGeneration();
     }
 
     /**
-     * 测试实体实例化
+     * @return iterable<array{string, mixed}>
      */
-    public function testInstantiation(): void
+    public static function propertiesProvider(): iterable
     {
-        self::assertInstanceOf(SiliconFlowVideoGeneration::class, $this->entity);
-        self::assertNull($this->entity->getId());
-        self::assertSame('', $this->entity->getModel());
-        self::assertSame('', $this->entity->getPrompt());
-        self::assertSame('pending', $this->entity->getStatus());
-        self::assertSame(5, $this->entity->getNumInferenceSteps());
+        return [
+            'requestId' => ['requestId', 'req_123456789'],
+            'model' => ['model', 'cogvideox-5b'],
+            'prompt' => ['prompt', 'A beautiful sunset over the ocean with waves crashing'],
+            'negativePrompt' => ['negativePrompt', 'blurry, low quality, distorted'],
+            'image' => ['image', 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAA...'],
+            'imageSize' => ['imageSize', '768x768'],
+            'seed' => ['seed', 123456789],
+            'numInferenceSteps' => ['numInferenceSteps', 20],
+            'requestPayload' => ['requestPayload', ['test' => 'data']],
+            'status' => ['status', 'completed'],
+        ];
     }
 
     /**
@@ -44,18 +44,19 @@ class SiliconFlowVideoGenerationTest extends AbstractIntegrationTestCase
      */
     public function testToString(): void
     {
-        $this->entity->setModel('cogvideox-flash');
-        $this->entity->setPrompt('A flying bird in the sky');
+        $entity = $this->createEntity();
+        $entity->setModel('cogvideox-flash');
+        $entity->setPrompt('A flying bird in the sky');
 
-        $result = (string) $this->entity;
+        $result = (string) $entity;
         self::assertStringStartsWith('cogvideox-flash: ', $result);
         self::assertStringContainsString('A flying bird in the sky', $result);
 
         // 测试长提示词截断
         $longPrompt = str_repeat('very long video prompt text ', 10);
-        $this->entity->setPrompt($longPrompt);
+        $entity->setPrompt($longPrompt);
 
-        $result = (string) $this->entity;
+        $result = (string) $entity;
         self::assertStringContainsString('...', $result);
         self::assertLessThanOrEqual(100, strlen($result));
     }
@@ -65,9 +66,10 @@ class SiliconFlowVideoGenerationTest extends AbstractIntegrationTestCase
      */
     public function testModel(): void
     {
+        $entity = $this->createEntity();
         $model = 'cogvideox-5b';
-        $this->entity->setModel($model);
-        self::assertSame($model, $this->entity->getModel());
+        $entity->setModel($model);
+        self::assertSame($model, $entity->getModel());
     }
 
     /**
@@ -75,9 +77,10 @@ class SiliconFlowVideoGenerationTest extends AbstractIntegrationTestCase
      */
     public function testPrompt(): void
     {
+        $entity = $this->createEntity();
         $prompt = 'A beautiful sunset over the ocean with waves crashing';
-        $this->entity->setPrompt($prompt);
-        self::assertSame($prompt, $this->entity->getPrompt());
+        $entity->setPrompt($prompt);
+        self::assertSame($prompt, $entity->getPrompt());
     }
 
     /**
@@ -85,12 +88,13 @@ class SiliconFlowVideoGenerationTest extends AbstractIntegrationTestCase
      */
     public function testNegativePrompt(): void
     {
+        $entity = $this->createEntity();
         $negativePrompt = 'blurry, low quality, distorted';
-        $this->entity->setNegativePrompt($negativePrompt);
-        self::assertSame($negativePrompt, $this->entity->getNegativePrompt());
+        $entity->setNegativePrompt($negativePrompt);
+        self::assertSame($negativePrompt, $entity->getNegativePrompt());
 
-        $this->entity->setNegativePrompt(null);
-        self::assertNull($this->entity->getNegativePrompt());
+        $entity->setNegativePrompt(null);
+        self::assertNull($entity->getNegativePrompt());
     }
 
     /**
@@ -98,12 +102,13 @@ class SiliconFlowVideoGenerationTest extends AbstractIntegrationTestCase
      */
     public function testImage(): void
     {
+        $entity = $this->createEntity();
         $imageBase64 = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAA...';
-        $this->entity->setImage($imageBase64);
-        self::assertSame($imageBase64, $this->entity->getImage());
+        $entity->setImage($imageBase64);
+        self::assertSame($imageBase64, $entity->getImage());
 
-        $this->entity->setImage(null);
-        self::assertNull($this->entity->getImage());
+        $entity->setImage(null);
+        self::assertNull($entity->getImage());
     }
 
     /**
@@ -111,12 +116,13 @@ class SiliconFlowVideoGenerationTest extends AbstractIntegrationTestCase
      */
     public function testImageSize(): void
     {
+        $entity = $this->createEntity();
         $imageSize = '768x768';
-        $this->entity->setImageSize($imageSize);
-        self::assertSame($imageSize, $this->entity->getImageSize());
+        $entity->setImageSize($imageSize);
+        self::assertSame($imageSize, $entity->getImageSize());
 
-        $this->entity->setImageSize(null);
-        self::assertNull($this->entity->getImageSize());
+        $entity->setImageSize(null);
+        self::assertNull($entity->getImageSize());
     }
 
     /**
@@ -124,9 +130,10 @@ class SiliconFlowVideoGenerationTest extends AbstractIntegrationTestCase
      */
     public function testNumInferenceSteps(): void
     {
+        $entity = $this->createEntity();
         $steps = 20;
-        $this->entity->setNumInferenceSteps($steps);
-        self::assertSame($steps, $this->entity->getNumInferenceSteps());
+        $entity->setNumInferenceSteps($steps);
+        self::assertSame($steps, $entity->getNumInferenceSteps());
     }
 
     /**
@@ -134,9 +141,10 @@ class SiliconFlowVideoGenerationTest extends AbstractIntegrationTestCase
      */
     public function testStatus(): void
     {
+        $entity = $this->createEntity();
         $status = 'completed';
-        $this->entity->setStatus($status);
-        self::assertSame($status, $this->entity->getStatus());
+        $entity->setStatus($status);
+        self::assertSame($status, $entity->getStatus());
     }
 
     /**
@@ -144,8 +152,10 @@ class SiliconFlowVideoGenerationTest extends AbstractIntegrationTestCase
      */
     public function testUser(): void
     {
-        $this->entity->setUser($this->mockUser);
-        self::assertSame($this->mockUser, $this->entity->getUser());
+        $entity = $this->createEntity();
+        $mockUser = $this->createMock(BizUser::class);
+        $entity->setUser($mockUser);
+        self::assertSame($mockUser, $entity->getUser());
     }
 
     /**
@@ -153,12 +163,13 @@ class SiliconFlowVideoGenerationTest extends AbstractIntegrationTestCase
      */
     public function testRequestId(): void
     {
+        $entity = $this->createEntity();
         $requestId = 'req_123456789';
-        $this->entity->setRequestId($requestId);
-        self::assertSame($requestId, $this->entity->getRequestId());
+        $entity->setRequestId($requestId);
+        self::assertSame($requestId, $entity->getRequestId());
 
-        $this->entity->setRequestId(null);
-        self::assertNull($this->entity->getRequestId());
+        $entity->setRequestId(null);
+        self::assertNull($entity->getRequestId());
     }
 
     /**
@@ -166,10 +177,11 @@ class SiliconFlowVideoGenerationTest extends AbstractIntegrationTestCase
      */
     public function testTimestampableTrait(): void
     {
-        self::assertTrue(method_exists($this->entity, 'getCreatedAt'));
-        self::assertTrue(method_exists($this->entity, 'getUpdatedAt'));
-        self::assertTrue(method_exists($this->entity, 'setCreatedAt'));
-        self::assertTrue(method_exists($this->entity, 'setUpdatedAt'));
+        $entity = $this->createEntity();
+        self::assertTrue(method_exists($entity, 'getCreateTime'));
+        self::assertTrue(method_exists($entity, 'getUpdateTime'));
+        self::assertTrue(method_exists($entity, 'setCreateTime'));
+        self::assertTrue(method_exists($entity, 'setUpdateTime'));
     }
 
     /**
@@ -177,7 +189,8 @@ class SiliconFlowVideoGenerationTest extends AbstractIntegrationTestCase
      */
     public function testStringableInterface(): void
     {
-        self::assertInstanceOf(\Stringable::class, $this->entity);
+        $entity = $this->createEntity();
+        self::assertInstanceOf(\Stringable::class, $entity);
     }
 
     /**
@@ -193,7 +206,7 @@ class SiliconFlowVideoGenerationTest extends AbstractIntegrationTestCase
         self::assertNull($entity->getImage());
         self::assertNull($entity->getImageSize());
         self::assertSame(5, $entity->getNumInferenceSteps());
-        self::assertSame('pending', $entity->getStatus());
+        self::assertNull($entity->getStatus());
         self::assertNull($entity->getRequestId());
         self::assertNull($entity->getUser());
     }

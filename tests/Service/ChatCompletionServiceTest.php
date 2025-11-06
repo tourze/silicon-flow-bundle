@@ -80,7 +80,13 @@ final class ChatCompletionServiceTest extends AbstractIntegrationTestCase
 
         $logger = $this->createMock(LoggerInterface::class);
 
-        $service = new ChatCompletionService($apiClient, $configRepository, $entityManager, $logger);
+        // 将所有 Mock 依赖注入到容器中
+        static::getContainer()->set(SiliconFlowApiClient::class, $apiClient);
+        static::getContainer()->set(SiliconFlowConfigRepository::class, $configRepository);
+        static::getContainer()->set(EntityManagerInterface::class, $entityManager);
+        static::getContainer()->set(LoggerInterface::class, $logger);
+
+        $service = self::getService(ChatCompletionService::class);
 
         $log = $service->createCompletion(
             'deepseek-chat',
@@ -154,7 +160,13 @@ final class ChatCompletionServiceTest extends AbstractIntegrationTestCase
 
         $logger = $this->createMock(LoggerInterface::class);
 
-        $service = new ChatCompletionService($apiClient, $configRepository, $entityManager, $logger);
+        // 将所有 Mock 依赖注入到容器中
+        static::getContainer()->set(SiliconFlowApiClient::class, $apiClient);
+        static::getContainer()->set(SiliconFlowConfigRepository::class, $configRepository);
+        static::getContainer()->set(EntityManagerInterface::class, $entityManager);
+        static::getContainer()->set(LoggerInterface::class, $logger);
+
+        $service = self::getService(ChatCompletionService::class);
 
         try {
             $service->createCompletion('deepseek-chat', [

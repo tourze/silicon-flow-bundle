@@ -6,34 +6,32 @@ namespace Tourze\SiliconFlowBundle\Tests\Entity;
 
 use BizUserBundle\Entity\BizUser;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Tourze\PHPUnitSymfonyKernelTest\AbstractIntegrationTestCase;
+use Tourze\PHPUnitDoctrineEntity\AbstractEntityTestCase;
 use Tourze\SiliconFlowBundle\Entity\SiliconFlowConversation;
 
 /**
  * SiliconFlow 对话实体测试
  */
 #[CoversClass(SiliconFlowConversation::class)]
-#[RunTestsInSeparateProcesses]
-class SiliconFlowConversationTest extends AbstractIntegrationTestCase
+class SiliconFlowConversationTest extends AbstractEntityTestCase
 {
-    private SiliconFlowConversation $entity;
-    private BizUser $mockUser;
-
-    protected function onSetUp(): void
+    protected function createEntity(): object
     {
-        $this->entity = new SiliconFlowConversation();
-        $this->mockUser = $this->createMock(BizUser::class);
+        return new SiliconFlowConversation();
     }
 
     /**
-     * 测试实体实例化
+     * @return iterable<array{string, mixed}>
      */
-    public function testInstantiation(): void
+    public static function propertiesProvider(): iterable
     {
-        self::assertInstanceOf(SiliconFlowConversation::class, $this->entity);
-        self::assertNull($this->entity->getId());
-        self::assertSame(SiliconFlowConversation::TYPE_SINGLE, $this->entity->getConversationType());
+        return [
+            'conversationType' => ['conversationType', SiliconFlowConversation::TYPE_CONTINUOUS],
+            'model' => ['model', 'gpt-4'],
+            'question' => ['question', '你好，请帮我解答一个问题'],
+            'answer' => ['answer', '当然可以，我很乐意帮助您'],
+            'contextSnapshot' => ['contextSnapshot', '之前的对话历史快照'],
+        ];
     }
 
     /**
@@ -50,14 +48,15 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
      */
     public function testToString(): void
     {
+        $entity = $this->createEntity();
         $shortQuestion = 'Hello World';
-        $this->entity->setQuestion($shortQuestion);
-        self::assertSame($shortQuestion, (string) $this->entity);
+        $entity->setQuestion($shortQuestion);
+        self::assertSame($shortQuestion, (string) $entity);
 
         // 测试长文本截断
         $longQuestion = str_repeat('这是一个非常长的问题，', 20);
-        $this->entity->setQuestion($longQuestion);
-        $result = (string) $this->entity;
+        $entity->setQuestion($longQuestion);
+        $result = (string) $entity;
         self::assertStringEndsWith('...', $result);
         self::assertLessThanOrEqual(53, mb_strlen($result)); // 50 + '...'
     }
@@ -67,11 +66,12 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
      */
     public function testConversationType(): void
     {
-        $this->entity->setConversationType(SiliconFlowConversation::TYPE_CONTINUOUS);
-        self::assertSame(SiliconFlowConversation::TYPE_CONTINUOUS, $this->entity->getConversationType());
+        $entity = $this->createEntity();
+        $entity->setConversationType(SiliconFlowConversation::TYPE_CONTINUOUS);
+        self::assertSame(SiliconFlowConversation::TYPE_CONTINUOUS, $entity->getConversationType());
 
-        $this->entity->setConversationType(SiliconFlowConversation::TYPE_SINGLE);
-        self::assertSame(SiliconFlowConversation::TYPE_SINGLE, $this->entity->getConversationType());
+        $entity->setConversationType(SiliconFlowConversation::TYPE_SINGLE);
+        self::assertSame(SiliconFlowConversation::TYPE_SINGLE, $entity->getConversationType());
     }
 
     /**
@@ -79,9 +79,10 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
      */
     public function testModel(): void
     {
+        $entity = $this->createEntity();
         $model = 'gpt-4-turbo';
-        $this->entity->setModel($model);
-        self::assertSame($model, $this->entity->getModel());
+        $entity->setModel($model);
+        self::assertSame($model, $entity->getModel());
     }
 
     /**
@@ -89,9 +90,10 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
      */
     public function testQuestion(): void
     {
+        $entity = $this->createEntity();
         $question = '你好，请帮我解答一个问题';
-        $this->entity->setQuestion($question);
-        self::assertSame($question, $this->entity->getQuestion());
+        $entity->setQuestion($question);
+        self::assertSame($question, $entity->getQuestion());
     }
 
     /**
@@ -99,12 +101,13 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
      */
     public function testAnswer(): void
     {
+        $entity = $this->createEntity();
         $answer = '当然可以，我很乐意帮助您';
-        $this->entity->setAnswer($answer);
-        self::assertSame($answer, $this->entity->getAnswer());
+        $entity->setAnswer($answer);
+        self::assertSame($answer, $entity->getAnswer());
 
-        $this->entity->setAnswer(null);
-        self::assertNull($this->entity->getAnswer());
+        $entity->setAnswer(null);
+        self::assertNull($entity->getAnswer());
     }
 
     /**
@@ -112,8 +115,10 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
      */
     public function testSender(): void
     {
-        $this->entity->setSender($this->mockUser);
-        self::assertSame($this->mockUser, $this->entity->getSender());
+        $entity = $this->createEntity();
+        $mockUser = $this->createMock(BizUser::class);
+        $entity->setSender($mockUser);
+        self::assertSame($mockUser, $entity->getSender());
     }
 
     /**
@@ -121,12 +126,13 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
      */
     public function testContext(): void
     {
+        $entity = $this->createEntity();
         $contextConversation = new SiliconFlowConversation();
-        $this->entity->setContext($contextConversation);
-        self::assertSame($contextConversation, $this->entity->getContext());
+        $entity->setContext($contextConversation);
+        self::assertSame($contextConversation, $entity->getContext());
 
-        $this->entity->setContext(null);
-        self::assertNull($this->entity->getContext());
+        $entity->setContext(null);
+        self::assertNull($entity->getContext());
     }
 
     /**
@@ -134,12 +140,13 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
      */
     public function testContextSnapshot(): void
     {
+        $entity = $this->createEntity();
         $snapshot = '之前的对话历史快照';
-        $this->entity->setContextSnapshot($snapshot);
-        self::assertSame($snapshot, $this->entity->getContextSnapshot());
+        $entity->setContextSnapshot($snapshot);
+        self::assertSame($snapshot, $entity->getContextSnapshot());
 
-        $this->entity->setContextSnapshot(null);
-        self::assertNull($this->entity->getContextSnapshot());
+        $entity->setContextSnapshot(null);
+        self::assertNull($entity->getContextSnapshot());
     }
 
     /**
@@ -147,22 +154,24 @@ class SiliconFlowConversationTest extends AbstractIntegrationTestCase
      */
     public function testCompleteEntity(): void
     {
+        $entity = $this->createEntity();
         $contextConversation = new SiliconFlowConversation();
+        $mockUser = $this->createMock(BizUser::class);
 
-        $this->entity->setConversationType(SiliconFlowConversation::TYPE_CONTINUOUS);
-        $this->entity->setModel('gpt-4');
-        $this->entity->setQuestion('这是一个测试问题');
-        $this->entity->setAnswer('这是一个测试回答');
-        $this->entity->setSender($this->mockUser);
-        $this->entity->setContext($contextConversation);
-        $this->entity->setContextSnapshot('历史快照');
+        $entity->setConversationType(SiliconFlowConversation::TYPE_CONTINUOUS);
+        $entity->setModel('gpt-4');
+        $entity->setQuestion('这是一个测试问题');
+        $entity->setAnswer('这是一个测试回答');
+        $entity->setSender($mockUser);
+        $entity->setContext($contextConversation);
+        $entity->setContextSnapshot('历史快照');
 
-        self::assertSame(SiliconFlowConversation::TYPE_CONTINUOUS, $this->entity->getConversationType());
-        self::assertSame('gpt-4', $this->entity->getModel());
-        self::assertSame('这是一个测试问题', $this->entity->getQuestion());
-        self::assertSame('这是一个测试回答', $this->entity->getAnswer());
-        self::assertSame($this->mockUser, $this->entity->getSender());
-        self::assertSame($contextConversation, $this->entity->getContext());
-        self::assertSame('历史快照', $this->entity->getContextSnapshot());
+        self::assertSame(SiliconFlowConversation::TYPE_CONTINUOUS, $entity->getConversationType());
+        self::assertSame('gpt-4', $entity->getModel());
+        self::assertSame('这是一个测试问题', $entity->getQuestion());
+        self::assertSame('这是一个测试回答', $entity->getAnswer());
+        self::assertSame($mockUser, $entity->getSender());
+        self::assertSame($contextConversation, $entity->getContext());
+        self::assertSame('历史快照', $entity->getContextSnapshot());
     }
 }

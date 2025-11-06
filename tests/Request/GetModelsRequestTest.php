@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tourze\SiliconFlowBundle\Tests\Request;
 
+use HttpClientBundle\Test\RequestTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
 use Tourze\SiliconFlowBundle\Entity\SiliconFlowConfig;
 use Tourze\SiliconFlowBundle\Exception\ApiException;
 use Tourze\SiliconFlowBundle\Request\GetModelsRequest;
 
 #[CoversClass(GetModelsRequest::class)]
-final class GetModelsRequestTest extends TestCase
+final class GetModelsRequestTest extends RequestTestCase
 {
     public function testBuildRequestOptions(): void
     {

@@ -79,4 +79,14 @@ class AttributeControllerLoaderTest extends AbstractIntegrationTestCase
             self::markTestSkipped('getNamespace method not found');
         }
     }
+
+    public function testSupports(): void
+    {
+        // 测试 supports 方法始终返回 false
+        self::assertFalse($this->loader->supports('any_resource'));
+        self::assertFalse($this->loader->supports('any_resource', 'any_type'));
+        self::assertFalse($this->loader->supports(null));
+        self::assertFalse($this->loader->supports([]));
+        self::assertFalse($this->loader->supports(new \stdClass()));
+    }
 }
