@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 use Tourze\SiliconFlowBundle\Client\SiliconFlowApiClient;
 use Tourze\SiliconFlowBundle\Entity\ChatCompletionLog;
 use Tourze\SiliconFlowBundle\Exception\ApiException;
+use Symfony\Contracts\HttpClient\ChunkInterface;
 use Tourze\SiliconFlowBundle\Repository\SiliconFlowConfigRepository;
 use Tourze\SiliconFlowBundle\Request\CreateChatCompletionRequest;
 
@@ -44,6 +45,10 @@ final class ChatCompletionService
      */
     public function createCompletion(string $model, array $messages, array $options = [], ?int $timeout = null): ChatCompletionLog
     {
+        if (!empty($options['stream'])) {
+            throw new \InvalidArgumentException('createCompletion 不支持 stream=true，请使用 createStreamingCompletion。');
+        }
+
         $config = $this->configRepository->findActiveConfig();
 
         if (null === $config) {
@@ -95,6 +100,88 @@ final class ChatCompletionService
     }
 
     /**
+     * @param array<int, array<string, mixed>> $messages
+     * @param array<string, mixed> $options
+     * @return array{answer: string, model: ?string, payload: array<string, mixed>}
+     * @throws ApiException
+     */
+    public function streamCompletion(string $model, array $messages, array $options = [], ?int $timeout = null, ?callable $emit = null): array
+    {
+        $config = $this->configRepository->findActiveConfig();
+
+        if (null === $config) {
+            throw new ApiException('未找到可用的 SiliconFlow 配置，无法发起请求。');
+        }
+
+        $optionsWithStream = array_merge($options, ['stream' => true]);
+
+        $request = new CreateChatCompletionRequest(
+            $config,
+            $model,
+            $messages,
+            $optionsWithStream,
+            $timeout,
+        );
+
+        $payload = $request->toArray();
+
+        $log = new ChatCompletionLog();
+        $log->setModel($request->getModel());
+        $log->setRequestPayload($payload);
+
+        $emit ??= static function (string $chunk): void {
+            // 默认不执行任何输出
+        };
+
+        try {
+            ['stream' => $stream] = $this->apiClient->requestStream($request);
+
+            $buffer = '';
+
+            /** @var ChunkInterface $chunk */
+            foreach ($stream as $chunk) {
+                if ($chunk->isTimeout()) {
+                    continue;
+                }
+
+                $content = $chunk->getContent();
+                if ('' === $content) {
+                    continue;
+                }
+
+                $buffer .= $content;
+                $emit($content);
+            }
+
+            $responseData = $request->parseResponse($buffer);
+
+            $this->applySuccessResponse($log, $responseData);
+            $this->persist($log);
+
+            return [
+                'answer' => $this->extractAnswerFromResponseData($responseData),
+                'model' => $this->extractModelFromResponseData($responseData),
+                'payload' => $responseData,
+            ];
+        } catch (ApiException $exception) {
+            $this->applyFailure($log, $exception->getMessage());
+            $this->persist($log);
+
+            throw $exception;
+        } catch (\Throwable $exception) {
+            $this->applyFailure($log, $exception->getMessage());
+            $this->persist($log);
+
+            $this->logger->error('SiliconFlow Chat Completion 流式请求出现未捕获异常', [
+                'error' => $exception->getMessage(),
+                'model' => $request->getModel(),
+            ]);
+
+            throw new ApiException('SiliconFlow Chat Completion 请求失败：' . $exception->getMessage(), 0, $exception);
+        }
+    }
+
+    /**
      * @param array<string, mixed> $response
      */
     private function applySuccessResponse(ChatCompletionLog $log, array $response): void
@@ -143,6 +230,95 @@ final class ChatCompletionService
         $log->setPromptTokens($promptTokens);
         $log->setCompletionTokens($completionTokens);
         $log->setTotalTokens($totalTokens);
+    }
+
+    /**
+     * @param array<string, mixed> $response
+     */
+    private function extractAnswerFromResponseData(array $response): string
+    {
+        $choices = $response['choices'] ?? null;
+        if (!is_array($choices)) {
+            return '';
+        }
+
+        foreach ($choices as $choice) {
+            if (!is_array($choice)) {
+                continue;
+            }
+
+            $message = $choice['message'] ?? null;
+            if (is_array($message)) {
+                $content = $message['content'] ?? null;
+                if (is_string($content)) {
+                    $trimmed = trim($content);
+                    if ('' !== $trimmed) {
+                        return $trimmed;
+                    }
+                } elseif (is_array($content)) {
+                    $text = '';
+                    foreach ($content as $block) {
+                        if (!is_array($block)) {
+                            continue;
+                        }
+
+                        $type = $block['type'] ?? null;
+                        $value = $block['text'] ?? ($block['content'] ?? null);
+
+                        if ('text' === $type && is_string($value)) {
+                            $text .= $value;
+                        }
+                    }
+
+                    $trimmed = trim($text);
+                    if ('' !== $trimmed) {
+                        return $trimmed;
+                    }
+                }
+            }
+
+            if (isset($choice['delta']) && is_array($choice['delta'])) {
+                $deltaContent = $choice['delta']['content'] ?? null;
+                if (is_string($deltaContent)) {
+                    $trimmed = trim($deltaContent);
+                    if ('' !== $trimmed) {
+                        return $trimmed;
+                    }
+                }
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * @param array<string, mixed> $response
+     */
+    private function extractModelFromResponseData(array $response): ?string
+    {
+        $model = $response['model'] ?? null;
+        if (is_string($model) && '' !== trim($model)) {
+            return trim($model);
+        }
+
+        $choices = $response['choices'] ?? null;
+        if (is_array($choices)) {
+            foreach ($choices as $choice) {
+                if (!is_array($choice)) {
+                    continue;
+                }
+
+                $message = $choice['message'] ?? null;
+                if (is_array($message) && isset($message['model']) && is_string($message['model'])) {
+                    $candidate = trim($message['model']);
+                    if ('' !== $candidate) {
+                        return $candidate;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

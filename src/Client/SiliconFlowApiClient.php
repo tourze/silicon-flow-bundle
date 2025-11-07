@@ -7,6 +7,8 @@ namespace Tourze\SiliconFlowBundle\Client;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
+use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 use Tourze\SiliconFlowBundle\Exception\ApiException;
 use Tourze\SiliconFlowBundle\Request\AbstractSiliconFlowRequest;
 
@@ -89,6 +91,73 @@ final class SiliconFlowApiClient
         }
 
         return $request->parseResponse($content);
+    }
+
+    /**
+     * @return array{response: ResponseInterface, stream: ResponseStreamInterface}
+     * @throws ApiException
+     */
+    public function requestStream(AbstractSiliconFlowRequest $request): array
+    {
+        $request->validate();
+
+        $method = $request->getRequestMethod() ?? 'POST';
+        $url = $request->getBaseUrl() . $request->getRequestPath();
+        $options = $request->getRequestOptions() ?? [];
+
+        if (!isset($options['timeout'])) {
+            $options['timeout'] = $this->defaultTimeout;
+        }
+
+        if (!array_key_exists('buffer', $options)) {
+            $options['buffer'] = false;
+        }
+
+        $sanitizedOptions = $this->sanitizeOptions($options);
+
+        $this->logger->info('SiliconFlow API 流式请求', [
+            'requestClass' => $request::class,
+            'method' => $method,
+            'url' => $url,
+            'options' => $sanitizedOptions,
+        ]);
+
+        try {
+            $response = $this->httpClient->request($method, $url, $options);
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode >= 400) {
+                $content = $response->getContent(false);
+
+                $this->logger->error('SiliconFlow API 流式请求返回异常状态码', [
+                    'requestClass' => $request::class,
+                    'statusCode' => $statusCode,
+                    'content' => $content,
+                ]);
+
+                throw new ApiException($request->parseError($content, $statusCode));
+            }
+        } catch (TransportExceptionInterface $exception) {
+            $this->logger->error('SiliconFlow API 流式请求失败', [
+                'requestClass' => $request::class,
+                'method' => $method,
+                'url' => $url,
+                'options' => $sanitizedOptions,
+                'error' => $exception->getMessage(),
+            ]);
+
+            throw new ApiException('调用 SiliconFlow 接口失败：' . $exception->getMessage(), 0, $exception);
+        }
+
+        $this->logger->info('SiliconFlow API 流式响应开始', [
+            'requestClass' => $request::class,
+            'statusCode' => isset($response) ? $response->getStatusCode() : null,
+        ]);
+
+        return [
+            'response' => $response,
+            'stream' => $this->httpClient->stream($response),
+        ];
     }
 
     /**

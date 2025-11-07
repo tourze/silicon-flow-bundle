@@ -55,6 +55,7 @@ final class CreateChatCompletionRequest extends AbstractSiliconFlowRequest
                 'Content-Type' => 'application/json',
                 'Accept' => $this->expectsStream() ? 'text/event-stream' : 'application/json',
             ],
+            'buffer' => $this->expectsStream() ? false : true,
         ];
     }
 

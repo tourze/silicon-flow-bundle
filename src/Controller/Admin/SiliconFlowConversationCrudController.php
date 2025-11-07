@@ -50,17 +50,23 @@ final class SiliconFlowConversationCrudController extends AbstractCrudController
                 '单轮对话' => SiliconFlowConversation::TYPE_SINGLE,
                 '连续对话' => SiliconFlowConversation::TYPE_CONTINUOUS,
             ])
+            ->hideOnForm()
         ;
-        yield AssociationField::new('sender', '发送者');
+        yield AssociationField::new('sender', '发送者')
+            ->hideOnForm()
+        ;
         yield AssociationField::new('context', '上条对话')
             ->hideOnIndex()
+            ->hideOnForm()
         ;
         yield TextareaField::new('question', '问题')
             ->setFormTypeOption('attr', ['rows' => 4])
+            ->hideOnForm()
         ;
         yield TextareaField::new('answer', '回答')
             ->hideOnIndex()
             ->setFormTypeOption('attr', ['rows' => 6])
+            ->hideOnForm()
         ;
         yield TextareaField::new('contextSnapshot', '上下文快照')
             ->onlyOnDetail()
@@ -89,7 +95,7 @@ final class SiliconFlowConversationCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         return $actions
-            ->disable(Action::NEW, Action::DELETE)
+            ->disable(Action::NEW, Action::DELETE, Action::EDIT)
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
         ;
     }
