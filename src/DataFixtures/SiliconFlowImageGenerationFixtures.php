@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tourze\SiliconFlowBundle\DataFixtures;
 
-use BizUserBundle\DataFixtures\BizUserFixtures;
-use BizUserBundle\Entity\BizUser;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Tourze\UserServiceContracts\UserManagerInterface;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -18,14 +18,19 @@ use Tourze\SiliconFlowBundle\Entity\SiliconFlowImageGeneration;
  */
 #[When(env: 'dev')]
 #[When(env: 'test')]
-class SiliconFlowImageGenerationFixtures extends Fixture implements FixtureGroupInterface, DependentFixtureInterface
+class SiliconFlowImageGenerationFixtures extends Fixture implements FixtureGroupInterface
 {
     public const DEFAULT_IMAGE_GENERATION_REFERENCE = 'default-image-generation';
 
+    public function __construct(
+        private readonly UserManagerInterface $userManager,
+    ) {
+    }
+
     public function load(ObjectManager $manager): void
     {
-        /** @var BizUser $adminUser */
-        $adminUser = $this->getReference(BizUserFixtures::ADMIN_USER_REFERENCE, BizUser::class);
+        // 获取或创建测试用户
+        $adminUser = $this->getOrCreateTestUser();
 
         $imageGeneration = new SiliconFlowImageGeneration();
         $imageGeneration->setModel('Kwai-Kolors/Kolors');
@@ -47,11 +52,18 @@ class SiliconFlowImageGenerationFixtures extends Fixture implements FixtureGroup
         $this->addReference(self::DEFAULT_IMAGE_GENERATION_REFERENCE, $imageGeneration);
     }
 
-    public function getDependencies(): array
+    private function getOrCreateTestUser(): UserInterface
     {
-        return [
-            BizUserFixtures::class,
-        ];
+        // 尝试加载已存在的用户
+        $user = $this->userManager->loadUserByIdentifier('test-image-generation-user');
+
+        // 如果用户不存在，创建一个新的测试用户
+        if (null === $user) {
+            $user = $this->userManager->createUser('test-image-generation-user', 'SiliconFlow图片生成测试用户');
+            $this->userManager->saveUser($user);
+        }
+
+        return $user;
     }
 
     public static function getGroups(): array

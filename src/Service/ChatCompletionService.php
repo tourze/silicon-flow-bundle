@@ -45,7 +45,7 @@ final class ChatCompletionService
      */
     public function createCompletion(string $model, array $messages, array $options = [], ?int $timeout = null): ChatCompletionLog
     {
-        if (!empty($options['stream'])) {
+        if (isset($options['stream']) && $options['stream'] === true) {
             throw new \InvalidArgumentException('createCompletion 不支持 stream=true，请使用 createStreamingCompletion。');
         }
 

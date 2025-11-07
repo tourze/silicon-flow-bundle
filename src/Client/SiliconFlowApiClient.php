@@ -151,7 +151,7 @@ final class SiliconFlowApiClient
 
         $this->logger->info('SiliconFlow API 流式响应开始', [
             'requestClass' => $request::class,
-            'statusCode' => isset($response) ? $response->getStatusCode() : null,
+            'statusCode' => $response->getStatusCode(),
         ]);
 
         return [

@@ -19,7 +19,7 @@ final class ImageProcessingService
 {
     public function __construct(
         private readonly HttpClientInterface $httpClient,
-        private readonly FileService $fileService,
+        private readonly ?FileService $fileService,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -87,6 +87,14 @@ final class ImageProcessingService
      */
     public function transferImageToLocal(string $remoteUrl): ?string
     {
+        // 如果没有文件服务，直接返回原URL
+        if (null === $this->fileService) {
+            $this->logger->info('FileService not available, using original URL', [
+                'remote_url' => $remoteUrl,
+            ]);
+            return $remoteUrl;
+        }
+
         try {
             $response = $this->httpClient->request('GET', $remoteUrl);
             if (200 !== $response->getStatusCode()) {

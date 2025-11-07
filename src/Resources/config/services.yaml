@@ -75,6 +75,8 @@ services:
 
   Tourze\SiliconFlowBundle\Service\ImageProcessingService:
     public: true
+    arguments:
+      $fileService: '@?Tourze\FileStorageBundle\Service\FileService'
 
   Tourze\SiliconFlowBundle\Service\AdminMenu:
     tags:

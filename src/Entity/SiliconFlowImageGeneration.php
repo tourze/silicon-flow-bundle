@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tourze\SiliconFlowBundle\Entity;
 
-use BizUserBundle\Entity\BizUser;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -89,10 +89,10 @@ class SiliconFlowImageGeneration implements \Stringable
     #[Assert\Positive]
     private ?int $responseSeed = null;
 
-    #[ORM\ManyToOne(targetEntity: BizUser::class)]
+    #[ORM\ManyToOne(targetEntity: UserInterface::class)]
     #[ORM\JoinColumn(name: 'sender_id', referencedColumnName: 'id', nullable: false, onDelete: 'RESTRICT')]
     #[Assert\NotNull]
-    private BizUser $sender;
+    private UserInterface $sender;
 
     #[ORM\Column(type: Types::STRING, length: 50, nullable: true, options: ['comment' => '响应状态'])]
     #[Assert\Length(max: 50)]
@@ -243,12 +243,12 @@ class SiliconFlowImageGeneration implements \Stringable
         $this->responseSeed = $responseSeed;
     }
 
-    public function getSender(): BizUser
+    public function getSender(): UserInterface
     {
         return $this->sender;
     }
 
-    public function setSender(BizUser $sender): void
+    public function setSender(UserInterface $sender): void
     {
         $this->sender = $sender;
     }

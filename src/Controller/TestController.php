@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tourze\SiliconFlowBundle\Controller;
 
-use BizUserBundle\Entity\BizUser;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -325,15 +325,11 @@ final class TestController extends AbstractController
         return $config;
     }
 
-    private function requireDefaultUser(): BizUser
+    private function requireDefaultUser(): UserInterface
     {
         $user = $this->userManager->loadUserByIdentifier('admin');
-        if (!$user instanceof BizUser) {
+        if (null === $user) {
             throw new ApiException('未找到用户名为 admin 的演示用户，请先导入测试数据。');
-        }
-
-        if (false === $user->isValid()) {
-            throw new ApiException('演示用户 admin 已被禁用，无法执行示例操作。');
         }
 
         return $user;

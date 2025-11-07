@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tourze\SiliconFlowBundle\DataFixtures;
 
-use BizUserBundle\DataFixtures\BizUserFixtures;
-use BizUserBundle\Entity\BizUser;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Tourze\UserServiceContracts\UserManagerInterface;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -18,14 +18,19 @@ use Tourze\SiliconFlowBundle\Entity\SiliconFlowVideoGeneration;
  */
 #[When(env: 'dev')]
 #[When(env: 'test')]
-class SiliconFlowVideoGenerationFixtures extends Fixture implements FixtureGroupInterface, DependentFixtureInterface
+class SiliconFlowVideoGenerationFixtures extends Fixture implements FixtureGroupInterface
 {
     public const DEFAULT_VIDEO_GENERATION_REFERENCE = 'default-video-generation';
 
+    public function __construct(
+        private readonly UserManagerInterface $userManager,
+    ) {
+    }
+
     public function load(ObjectManager $manager): void
     {
-        /** @var BizUser $adminUser */
-        $adminUser = $this->getReference(BizUserFixtures::ADMIN_USER_REFERENCE, BizUser::class);
+        // 获取或创建测试用户
+        $adminUser = $this->getOrCreateTestUser();
 
         $videoGeneration = new SiliconFlowVideoGeneration();
         $videoGeneration->setModel('Wan-AI/Wan2.2-T2V-A14B');
@@ -47,11 +52,18 @@ class SiliconFlowVideoGenerationFixtures extends Fixture implements FixtureGroup
         $this->addReference(self::DEFAULT_VIDEO_GENERATION_REFERENCE, $videoGeneration);
     }
 
-    public function getDependencies(): array
+    private function getOrCreateTestUser(): UserInterface
     {
-        return [
-            BizUserFixtures::class,
-        ];
+        // 尝试加载已存在的用户
+        $user = $this->userManager->loadUserByIdentifier('test-video-generation-user');
+
+        // 如果用户不存在，创建一个新的测试用户
+        if (null === $user) {
+            $user = $this->userManager->createUser('test-video-generation-user', 'SiliconFlow视频生成测试用户');
+            $this->userManager->saveUser($user);
+        }
+
+        return $user;
     }
 
     public static function getGroups(): array

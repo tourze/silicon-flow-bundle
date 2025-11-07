@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tourze\SiliconFlowBundle\Entity;
 
-use BizUserBundle\Entity\BizUser;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -47,10 +47,10 @@ class SiliconFlowConversation implements \Stringable
     #[Assert\Length(max: 65535)]
     private ?string $answer = null;
 
-    #[ORM\ManyToOne(targetEntity: BizUser::class)]
+    #[ORM\ManyToOne(targetEntity: UserInterface::class)]
     #[ORM\JoinColumn(name: 'sender_id', referencedColumnName: 'id', nullable: false, onDelete: 'RESTRICT')]
     #[Assert\NotNull]
-    private BizUser $sender;
+    private UserInterface $sender;
 
     // 上下文
     #[ORM\ManyToOne(targetEntity: self::class)]
@@ -112,12 +112,12 @@ class SiliconFlowConversation implements \Stringable
         $this->answer = $answer;
     }
 
-    public function getSender(): BizUser
+    public function getSender(): UserInterface
     {
         return $this->sender;
     }
 
-    public function setSender(BizUser $sender): void
+    public function setSender(UserInterface $sender): void
     {
         $this->sender = $sender;
     }

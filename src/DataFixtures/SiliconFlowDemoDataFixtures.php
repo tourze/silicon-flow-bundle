@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tourze\SiliconFlowBundle\DataFixtures;
 
-use BizUserBundle\DataFixtures\BizUserFixtures;
-use BizUserBundle\Entity\BizUser;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Tourze\UserServiceContracts\UserManagerInterface;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -20,19 +20,20 @@ use Tourze\SiliconFlowBundle\Repository\SiliconFlowVideoGenerationRepository;
 
 #[When(env: 'dev')]
 #[When(env: 'test')]
-class SiliconFlowDemoDataFixtures extends Fixture implements FixtureGroupInterface, DependentFixtureInterface
+class SiliconFlowDemoDataFixtures extends Fixture implements FixtureGroupInterface
 {
     public function __construct(
         private readonly SiliconFlowConversationRepository $conversationRepository,
         private readonly SiliconFlowImageGenerationRepository $imageGenerationRepository,
         private readonly SiliconFlowVideoGenerationRepository $videoGenerationRepository,
+        private readonly UserManagerInterface $userManager,
     ) {
     }
 
     public function load(ObjectManager $manager): void
     {
-        /** @var BizUser $sender */
-        $sender = $this->getReference(BizUserFixtures::ADMIN_USER_REFERENCE, BizUser::class);
+        // 获取或创建测试用户
+        $sender = $this->getOrCreateTestUser();
 
         $this->createConversations($manager, $sender);
         $this->createImageGeneration($manager, $sender);
@@ -46,15 +47,21 @@ class SiliconFlowDemoDataFixtures extends Fixture implements FixtureGroupInterfa
         return ['silicon_flow'];
     }
 
-    public function getDependencies(): array
+    private function getOrCreateTestUser(): UserInterface
     {
-        return [
-            SiliconFlowConfigFixtures::class,
-            BizUserFixtures::class,
-        ];
+        // 尝试加载已存在的用户
+        $user = $this->userManager->loadUserByIdentifier('test-demo-user');
+
+        // 如果用户不存在，创建一个新的测试用户
+        if (null === $user) {
+            $user = $this->userManager->createUser('test-demo-user', 'SiliconFlow演示数据用户');
+            $this->userManager->saveUser($user);
+        }
+
+        return $user;
     }
 
-    private function createConversations(ObjectManager $manager, BizUser $sender): void
+    private function createConversations(ObjectManager $manager, UserInterface $sender): void
     {
         $entries = [
             [
@@ -96,7 +103,7 @@ class SiliconFlowDemoDataFixtures extends Fixture implements FixtureGroupInterfa
         }
     }
 
-    private function createImageGeneration(ObjectManager $manager, BizUser $sender): void
+    private function createImageGeneration(ObjectManager $manager, UserInterface $sender): void
     {
         $createdAt = new \DateTimeImmutable('2025-10-24 11:35:28');
 
@@ -128,7 +135,7 @@ class SiliconFlowDemoDataFixtures extends Fixture implements FixtureGroupInterfa
         $imageGeneration->setUpdateTime($createdAt);
     }
 
-    private function createVideoGeneration(ObjectManager $manager, BizUser $sender): void
+    private function createVideoGeneration(ObjectManager $manager, UserInterface $sender): void
     {
         $createdAt = new \DateTimeImmutable('2025-10-24 14:10:00');
         $updatedAt = new \DateTimeImmutable('2025-10-24 14:15:43');
