@@ -47,6 +47,11 @@ class SiliconFlowConversation implements \Stringable
     #[Assert\Length(max: 65535)]
     private ?string $answer = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '推理内容'])]
+    #[Assert\Type(type: 'string')]
+    #[Assert\Length(max: 65535)]
+    private ?string $reasoningContent = null;
+
     #[ORM\ManyToOne(targetEntity: UserInterface::class)]
     #[ORM\JoinColumn(name: 'sender_id', referencedColumnName: 'id', nullable: false, onDelete: 'RESTRICT')]
     #[Assert\NotNull]
@@ -110,6 +115,16 @@ class SiliconFlowConversation implements \Stringable
     public function setAnswer(?string $answer): void
     {
         $this->answer = $answer;
+    }
+
+    public function getReasoningContent(): ?string
+    {
+        return $this->reasoningContent;
+    }
+
+    public function setReasoningContent(?string $reasoningContent): void
+    {
+        $this->reasoningContent = $reasoningContent;
     }
 
     public function getSender(): UserInterface
