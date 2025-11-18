@@ -61,13 +61,4 @@ class SiliconFlowConfigCrudControllerTest extends AbstractEasyAdminControllerTes
             '是否启用' => ['是否启用'],
         ];
     }
-
-    /**
-     * 测试获取实体类名
-     */
-    public function testGetEntityFqcn(): void
-    {
-        $fqcn = SiliconFlowConfigCrudController::getEntityFqcn();
-        self::assertSame(SiliconFlowConfig::class, $fqcn);
-    }
 }

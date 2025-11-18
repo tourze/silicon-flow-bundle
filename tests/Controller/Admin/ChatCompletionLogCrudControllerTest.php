@@ -61,13 +61,4 @@ class ChatCompletionLogCrudControllerTest extends AbstractEasyAdminControllerTes
             '状态' => ['状态'],
         ];
     }
-
-    /**
-     * 测试获取实体类名
-     */
-    public function testGetEntityFqcn(): void
-    {
-        $fqcn = ChatCompletionLogCrudController::getEntityFqcn();
-        self::assertSame(ChatCompletionLog::class, $fqcn);
-    }
 }

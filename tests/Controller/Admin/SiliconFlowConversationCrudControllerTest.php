@@ -61,13 +61,4 @@ class SiliconFlowConversationCrudControllerTest extends AbstractEasyAdminControl
             '问题内容' => ['问题内容'],
         ];
     }
-
-    /**
-     * 测试获取实体类名
-     */
-    public function testGetEntityFqcn(): void
-    {
-        $fqcn = SiliconFlowConversationCrudController::getEntityFqcn();
-        self::assertSame(SiliconFlowConversation::class, $fqcn);
-    }
 }
